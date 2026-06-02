@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import { pages } from "../data/site";
-import { getPageByPath } from "../utils/navigation";
+import { getNavigationMode, getPageByPath, shouldUseTransitionOverlay } from "../utils/navigation";
 import BgmPlayer from "./BgmPlayer";
 import HomePage from "./HomePage";
 import PageTransitionOverlay from "./PageTransitionOverlay";
@@ -18,10 +18,17 @@ export default function AppShell() {
     [location.pathname],
   );
   const [transition, setTransition] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // 触发色带铺屏转场，并在遮盖完成后切换路由。
-  function handleNavigate(page) {
+  function handleNavigate(page, navigationMode = "sidebar") {
     if (page.path === location.pathname || transition) {
+      return;
+    }
+
+    if (!shouldUseTransitionOverlay(navigationMode)) {
+      navigate(page.path);
+      setIsMobileMenuOpen(false);
       return;
     }
 
@@ -60,13 +67,21 @@ export default function AppShell() {
       <BgmPlayer isHome={currentPage.id === "home"} />
       <SidebarAccordion
         activePageId={currentPage.id}
+        isMobileMenuOpen={isMobileMenuOpen}
         isTransitioning={Boolean(transition)}
         onNavigate={handleNavigate}
+        onMobileNavigate={(page) =>
+          handleNavigate(page, getNavigationMode(window.innerWidth))
+        }
+        onToggleMobileMenu={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
       />
       <PageTransitionOverlay
         transition={transition}
         onCovered={handleCovered}
-        onComplete={() => setTransition(null)}
+        onComplete={() => {
+          setTransition(null);
+          setIsMobileMenuOpen(false);
+        }}
       />
     </div>
   );

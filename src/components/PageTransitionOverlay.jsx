@@ -28,22 +28,29 @@ export default function PageTransitionOverlay({
       const sidebarBands = Array.from(document.querySelectorAll(".sidebar-band"));
       const sidebarLabels = sidebarBands.map((band) => band.querySelector("span"));
 
-      if (reduceMotion || sidebarBands.length === 0) {
+      if (reduceMotion) {
+        onCovered(transition.page);
+        onComplete();
+        return;
+      }
+
+      if (sidebarBands.length === 0) {
         onCovered(transition.page);
         onComplete();
         return;
       }
 
       const sidebarRect = sidebarBands[0].parentElement.getBoundingClientRect();
-
+      const sidebar = sidebarBands[0].parentElement;
       gsap.set(overlay, {
         autoAlpha: 1,
       });
+      sidebar.classList.remove("is-handoff-ready");
       gsap.set(track, {
         right: 0,
         top: sidebarRect.top,
         width: sidebarRect.width,
-        height: sidebarRect.height,
+        height: window.innerHeight,
       });
       gsap.set(sidebarLabels, { y: 0 });
 
@@ -80,9 +87,13 @@ export default function PageTransitionOverlay({
         },
       }, "-=0.18").set(sidebarLabels, {
         clearProps: "transform",
+      }).call(() => {
+        sidebar.classList.add("is-handoff-ready");
       }).set(overlay, {
         autoAlpha: 0,
       }).set(overlay, {
+        clearProps: "all",
+      }).set(track, {
         clearProps: "all",
       });
     },
@@ -99,22 +110,6 @@ export default function PageTransitionOverlay({
             style={{ "--band-color": page.color, "--band-ink": page.ink }}
           />
         ))}
-        <span
-          className="transition-band-divider"
-          style={{ "--divider-left": "0%" }}
-        />
-        <span
-          className="transition-band-divider"
-          style={{ "--divider-left": "25%" }}
-        />
-        <span
-          className="transition-band-divider"
-          style={{ "--divider-left": "50%" }}
-        />
-        <span
-          className="transition-band-divider"
-          style={{ "--divider-left": "75%" }}
-        />
       </div>
     </div>
   );

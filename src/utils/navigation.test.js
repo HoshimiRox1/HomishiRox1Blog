@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  getMobileMenuLabel,
   getNextCharacterIndex,
+  getNavigationMode,
   getPageById,
   getPageByPath,
+  shouldUseTransitionOverlay,
 } from "./navigation";
 
 const pages = [
@@ -39,5 +42,22 @@ describe("page lookup helpers", () => {
   it("finds pages by id and falls back to Home", () => {
     expect(getPageById(pages, "blog")?.path).toBe("/blog");
     expect(getPageById(pages, "missing")?.path).toBe("/");
+  });
+});
+
+describe("responsive navigation helpers", () => {
+  it("uses a bottom menu instead of the sidebar at narrow widths", () => {
+    expect(getNavigationMode(760)).toBe("mobile-menu");
+    expect(getNavigationMode(761)).toBe("sidebar");
+  });
+
+  it("switches the mobile menu button label by open state", () => {
+    expect(getMobileMenuLabel(false)).toBe("MENU");
+    expect(getMobileMenuLabel(true)).toBe("CLOSE");
+  });
+
+  it("uses the full-screen transition overlay only for the desktop sidebar", () => {
+    expect(shouldUseTransitionOverlay("sidebar")).toBe(true);
+    expect(shouldUseTransitionOverlay("mobile-menu")).toBe(false);
   });
 });
