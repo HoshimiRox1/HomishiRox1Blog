@@ -64,8 +64,8 @@
 ## Task 5: Build Sidebar Transition and Placeholder Pages
 
 - [ ] Implement four right-side full-height color bands in fixed order: Home, Profile, Portfolio, Blog.
-- [ ] Implement active state from current route as a subtle text-only float/shadow treatment; do not move, filter, mask, or underline the full band.
-- [ ] On click, hide the four band labels in order, expand one cloned flex track from the right rail into equal full-screen columns, navigate after expansion, then reverse back to the rail. The four columns must stay adjacent throughout expansion, with no exposed background gaps.
+- [ ] Implement active state from current route as stable text-only highlighting; do not float, shadow, move, filter, mask, or underline the full band.
+- [ ] On click, slide the four real sidebar label nodes downward out of the viewport in order without opacity fading. Only after every label exits, expand one label-free cloned flex track from the right rail into equal full-screen columns, navigate after expansion, then shrink back to the rail before returning the original labels in reverse order. The four columns must stay adjacent throughout expansion, with no exposed background gaps.
 - [ ] Implement placeholder page entrance animation and Phase 1 copy.
 
 ## Task 6: Build Marquee and BGM Player

@@ -7,8 +7,8 @@
 - Home 首次滚轮揭示当前角色，后续滚轮按方向在两个角色之间循环切换。
 - 已接入 `waifus/珂莱塔-cutout.png` 和 `waifus/洛琪希-cutout.png`。
 - 右侧常驻 Home / Profile / Portfolio / Blog 四条 FEED 式竖向包豪斯色带。
-- 手风琴 hover 和当前页面态只让旋转文字轻微悬浮并带少量阴影；不使用 underline，也不移动或高亮整条色带。
-- 点击色带后通过 GSAP 四色带转场切换页面：文字顺序下滑消失，四条色带从右侧原位展开为全屏四等分列，切换路由后倒放缩回。
+- 手风琴 hover 和当前页面态只让旋转文字稳定高亮；不使用 underline、阴影或悬浮位移，也不移动或高亮整条色带。
+- 点击色带后通过 GSAP 四色带转场切换页面：文字顺序直接滑出屏幕，不做透明度渐隐；四条文字全部离开后，四条色带从右侧原位展开为全屏四等分列，切换路由后倒放缩回。
 - BGM 播放器固定左下角，Home 页面时上移避开底部 marquee。
 
 ## 采用架构
@@ -59,11 +59,15 @@
 
 - `AppShell` 根据当前 `location.pathname` 查找 active page，避免每个页面重复管理导航状态。
 - `SidebarAccordion` 只发起导航意图；真实 `navigate()` 在 `PageTransitionOverlay` 的四列铺屏后执行。
-- `SidebarAccordion` 的 hover/active 视觉反馈只落在 `span` 文本上：`rotate(90deg) translateY(-4px)` 加轻量 `text-shadow`；色带按钮本体保持 `transform/filter: none`。
-- `PageTransitionOverlay` 不移动真实右侧手风琴，而是测量 `.sidebar-accordion` 的当前位置，渲染一个 `.transition-band-track` 克隆轨道，轨道内部四条色带用 flex 等分。
+- `SidebarAccordion` 的 hover/active 视觉反馈只落在 `span` 文本上：保留基础 `rotate(90deg)`，通过文字背景和颜色反转做即时高亮；不对文字颜色或色块透明度做过渡，避免高反差文字在重绘时产生视觉抖动；色带按钮本体保持 `transform/filter: none`。
+- 文字高亮背景由 `span::before` 伪元素绘制，不给文字本体增加 padding，因此旋转文字盒子尺寸不会在 active 状态变化。
+- `PageTransitionOverlay` 测量 `.sidebar-accordion` 的当前位置，渲染一个只包含色带和分隔线的 `.transition-band-track` 克隆轨道，轨道内部四条色带用 flex 等分。
+- 转场文字不渲染第二套克隆节点：GSAP 直接驱动 `.sidebar-band span` 真实节点依次下滑出屏，并在克隆轨道缩回后按反向顺序归位，避免 handoff 时产生左右偏移或闪烁。
 - 转场动画只驱动克隆轨道整体 `width` 从右侧 rail 宽度扩到视口宽度，再缩回；组内四列始终相邻，因此动画过程中不会露出页面底色或列间缝隙。
 - 黑色分隔线由 `.transition-band-divider` 作为绝对定位覆盖层提供，固定 `4px` 宽并压在 `0% / 25% / 50% / 75%` 处，包含 Home 左侧边界和三条内部接缝线，不参与 flex 布局。
-- 转场期间 `.sidebar-accordion.is-transitioning` 设为透明，让克隆轨道接管视觉，避免真实色带黑边和动画黑边短暂叠加变粗。
+- 转场期间 `.sidebar-accordion.is-transitioning` 提高层级，并把真实 `.sidebar-band` 的背景和边框设为透明：克隆轨道接管色带视觉，真实文字节点仍留在上层参与动画，避免黑边叠加变粗。
+- 响应式黑边宽度由 `--rail-border-width` 统一控制：桌面为 `4px`，窄屏为 `3px`；真实 `.sidebar-band` 和转场 `.transition-band-divider` 必须读取同一变量。
+- 窄屏下真实 `.sidebar-band span` 使用 `1rem` 字号，`.sidebar-band` 使用 `18px` 底部 padding；转场不再需要克隆文字的响应式位置补偿。
 - `HomePage` 使用 `lockRef` 管理 850ms 滚轮锁，避免一次手势或动画期间连续跳多个角色。
 - 首次有效滚轮只从首屏进入角色舞台，不把索引从 0 跳到 1；后续滚轮才调用 `getNextCharacterIndex`。
 - `getNextCharacterIndex` 使用 delta 方向推进一步，并在首尾循环；下滚到末尾后继续从第一个角色入场，不做倒放动画。

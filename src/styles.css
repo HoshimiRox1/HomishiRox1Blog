@@ -34,6 +34,7 @@ button {
 
 .app-shell {
   --sidebar-width: clamp(148px, 17vw, 244px);
+  --rail-border-width: 4px;
   --marquee-height: 58px;
   min-height: 100vh;
   background:
@@ -195,23 +196,26 @@ button {
   bottom: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  opacity: 1;
   position: fixed;
   right: 0;
   top: 0;
-  transition: opacity 0ms linear;
   width: var(--sidebar-width);
   z-index: 20;
 }
 
 .sidebar-accordion.is-transitioning {
-  opacity: 0;
+  z-index: 40;
+}
+
+.sidebar-accordion.is-transitioning .sidebar-band {
+  background: transparent;
+  border-left-color: transparent;
 }
 
 .sidebar-band {
   align-items: flex-end;
   background: var(--band-color);
-  border-left: 4px solid #090909;
+  border-left: var(--rail-border-width) solid #090909;
   color: var(--band-ink);
   display: flex;
   justify-content: center;
@@ -232,18 +236,27 @@ button {
   text-transform: uppercase;
   transform: rotate(90deg);
   transform-origin: center;
-  transition:
-    text-shadow 160ms ease,
-    transform 160ms ease;
   white-space: nowrap;
+  z-index: 0;
+}
+
+.sidebar-band span::before {
+  background: var(--band-ink);
+  content: "";
+  inset: -0.12em -0.18em -0.08em;
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
 }
 
 .sidebar-band:hover span,
 .sidebar-band.is-active span {
-  text-shadow:
-    0.045em 0.045em 0 rgba(9, 9, 9, 0.28),
-    0 0.08em 0 rgba(251, 245, 231, 0.18);
-  transform: rotate(90deg) translateY(-4px);
+  color: var(--band-color);
+}
+
+.sidebar-band:hover span::before,
+.sidebar-band.is-active span::before {
+  opacity: 1;
 }
 
 .bgm-player {
@@ -308,29 +321,11 @@ button {
 }
 
 .transition-band {
-  align-items: flex-end;
   background: var(--band-color);
-  color: var(--band-ink);
-  display: flex;
   flex: 1 0 0;
-  justify-content: center;
   min-width: 0;
   overflow: hidden;
-  padding-bottom: clamp(26px, 5vh, 52px);
   position: relative;
-}
-
-.transition-band-label {
-  display: block;
-  font-size: clamp(1.4rem, 3.4vw, 3.3rem);
-  font-weight: 950;
-  letter-spacing: 0;
-  line-height: 1;
-  text-transform: uppercase;
-  transform: rotate(90deg);
-  transform-origin: center;
-  white-space: nowrap;
-  will-change: transform, opacity;
 }
 
 .transition-band-divider {
@@ -339,7 +334,7 @@ button {
   left: var(--divider-left);
   position: absolute;
   top: 0;
-  width: 4px;
+  width: var(--rail-border-width);
   z-index: 2;
 }
 
@@ -423,6 +418,7 @@ button {
 @media (max-width: 760px) {
   .app-shell {
     --sidebar-width: 72px;
+    --rail-border-width: 3px;
     --marquee-height: 48px;
   }
 
@@ -473,7 +469,6 @@ button {
   }
 
   .sidebar-band {
-    border-left-width: 3px;
     padding-bottom: 18px;
   }
 

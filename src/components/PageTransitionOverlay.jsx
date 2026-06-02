@@ -26,10 +26,7 @@ export default function PageTransitionOverlay({
       const overlay = overlayRef.current;
       const track = overlay.querySelector(".transition-band-track");
       const sidebarBands = Array.from(document.querySelectorAll(".sidebar-band"));
-      const transitionLabels = gsap.utils.toArray(
-        ".transition-band-label",
-        overlay,
-      );
+      const sidebarLabels = sidebarBands.map((band) => band.querySelector("span"));
 
       if (reduceMotion || sidebarBands.length === 0) {
         onCovered(transition.page);
@@ -48,17 +45,16 @@ export default function PageTransitionOverlay({
         width: sidebarRect.width,
         height: sidebarRect.height,
       });
-      gsap.set(transitionLabels, { y: 0, autoAlpha: 1 });
+      gsap.set(sidebarLabels, { y: 0 });
 
       const tl = gsap.timeline({
         onComplete,
       });
 
-      tl.to(transitionLabels, {
-        y: 58,
-        autoAlpha: 0,
-        duration: 0.28,
-        ease: "power2.in",
+      tl.to(sidebarLabels, {
+        y: window.innerHeight + 180,
+        duration: 0.44,
+        ease: "power3.in",
         stagger: 0.06,
       }).to(
         track,
@@ -68,22 +64,23 @@ export default function PageTransitionOverlay({
           ease: "power3.inOut",
           onComplete: () => onCovered(transition.page),
         },
-        0.18,
+        ">",
       ).to(track, {
         width: sidebarRect.width,
         duration: 0.58,
         ease: "power3.inOut",
         delay: 0.08,
-      }).to(transitionLabels, {
+      }).to(sidebarLabels, {
         y: 0,
-        autoAlpha: 1,
-        duration: 0.22,
+        duration: 0.26,
         ease: "power2.out",
         stagger: {
           each: 0.045,
           from: "end",
         },
-      }, "-=0.18").set(overlay, {
+      }, "-=0.18").set(sidebarLabels, {
+        clearProps: "transform",
+      }).set(overlay, {
         autoAlpha: 0,
       }).set(overlay, {
         clearProps: "all",
@@ -100,9 +97,7 @@ export default function PageTransitionOverlay({
             className="transition-band"
             key={page.id}
             style={{ "--band-color": page.color, "--band-ink": page.ink }}
-          >
-            <span className="transition-band-label">{page.label}</span>
-          </div>
+          />
         ))}
         <span
           className="transition-band-divider"
