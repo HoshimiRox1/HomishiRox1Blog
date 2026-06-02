@@ -8,7 +8,7 @@
 - 已接入 `waifus/珂莱塔-cutout.png` 和 `waifus/洛琪希-cutout.png`。
 - 桌面端右侧常驻 Home / Profile / Portfolio / Blog 四条 FEED 式竖向包豪斯色带。
 - 窄屏端隐藏右侧手风琴，改为底部 Menu 按钮打开四色全屏菜单；菜单四条竖条停在按钮上方，不遮挡按钮。
-- 手风琴 hover 使用近白底和对应板块色文字；Home 默认态为黑底近白字，避免和 hover 底色撞色；不保留当前页面高亮状态，不使用 underline、阴影或悬浮位移。
+- 手风琴 hover 使用近白底和对应板块色文字；Home 默认态为冷灰底黑字，避免和主背景或 hover 底色撞色；不保留当前页面高亮状态，不使用 underline、阴影或悬浮位移。
 - 桌面端点击色带后通过 GSAP 四色带转场切换页面：文字顺序直接滑出屏幕，不做透明度渐隐；四条文字全部离开后，四色克隆轨道从右侧原位等比横向扩张铺满屏幕，黑边保持固定宽度，切换路由后缩回右侧原位；桌面文字底部保留约 100px 安全距离。
 - 窄屏端点击 Menu 后四条竖条从上往下、按 Home / Profile / Portfolio / Blog 顺序依次滑入；点击板块后四条竖条从左到右依次上滑消失，退出完成后切换页面。
 - BGM 播放器固定左下角，Home 页面时上移避开底部 marquee。
@@ -62,7 +62,7 @@
 - `AppShell` 根据当前 `location.pathname` 查找 active page，避免每个页面重复管理导航状态。
 - `SidebarAccordion` 发起导航意图；桌面真实 `navigate()` 在 `PageTransitionOverlay` 的四列铺屏后执行，窄屏真实 `navigate()` 在手机菜单四列退出后执行。
 - `SidebarAccordion` 同时渲染桌面 `.sidebar-accordion` 和窄屏 `.mobile-menu-panel`；CSS 媒体查询决定可见形态，React 只维护一个 `isMobileMenuOpen` 布尔状态。
-- `SidebarAccordion` 的 hover 视觉反馈由 `.sidebar-band::before` 和 `.mobile-menu-band::before` 绘制近白色整条背景，文字切换为对应板块色；桌面 `.sidebar-band span` 使用固定文字盒宽度、右侧锚点和 `rotate(-90deg)`，让文字字底朝右并贴近各自色带右边缘，同时保持约 50px 底部留白；不使用 `.is-active` 当前页高亮。
+- `SidebarAccordion` 的 hover 视觉反馈由 `.sidebar-band::before` 和 `.mobile-menu-band::before` 绘制近白色整条背景，文字切换为对应板块色；桌面 `.sidebar-band span` 使用左下角作为右侧锚点和 `rotate(-90deg)`，并加入少量字体视觉出血补偿，让文字字底朝右并与各自色带右边缘接触，同时保持约 50px 底部留白；不使用 `.is-active` 当前页高亮。
 - `PageTransitionOverlay` 测量 `.sidebar-accordion` 的当前位置，渲染一个只包含色带和分隔线的 `.transition-band-track` 克隆轨道，轨道内部四条色带用 grid 等分。
 - 转场文字不渲染第二套克隆节点：GSAP 直接驱动 `.sidebar-band span` 真实节点依次下滑出屏，并在克隆轨道缩回后按反向顺序归位，避免 handoff 时产生左右偏移或闪烁。
 - 桌面转场动画驱动克隆轨道的 `width`：轨道固定在右侧，从 sidebar 当前宽度扩张到视口宽度，执行路由切换后再缩回。轨道内部四条色带使用和真实 sidebar 一致的 grid 等分，每条克隆色带用固定 `border-left` 画黑边，因此扩张时黑边宽度不被缩放。

@@ -33,7 +33,7 @@ button {
 }
 
 .app-shell {
-  --sidebar-width: clamp(148px, 17vw, 244px);
+  --sidebar-width: clamp(308px, calc(17vw + 160px), 404px);
   --rail-border-width: 4px;
   --marquee-height: 58px;
   --mobile-menu-height: 64px;
@@ -244,22 +244,22 @@ button {
 }
 
 .sidebar-band span {
-  --sidebar-label-bottom-safe: clamp(68px, 10vh, 76px);
-  --sidebar-label-width: 6em;
+  --sidebar-label-bottom-safe: clamp(48px, 7vh, 56px);
+  --sidebar-label-edge-bleed: clamp(3px, 0.12em, 6px);
   display: block;
-  font-size: clamp(1.4rem, 3.4vw, 3.3rem);
+  font-size: clamp(2.3rem, 5.5vw, 5.3rem);
   font-weight: 950;
   letter-spacing: 0;
   line-height: 1;
+  bottom: var(--sidebar-label-bottom-safe);
+  left: calc(100% + var(--sidebar-label-edge-bleed));
   position: absolute;
-  right: calc(var(--rail-border-width) + 0.4em);
   text-align: left;
   text-transform: uppercase;
-  top: calc(100% - var(--sidebar-label-bottom-safe) - var(--sidebar-label-width));
   transform: rotate(-90deg);
-  transform-origin: right center;
+  transform-origin: left bottom;
   white-space: nowrap;
-  width: var(--sidebar-label-width);
+  width: max-content;
   z-index: 1;
 }
 
@@ -595,7 +595,6 @@ button {
   .mobile-menu-toggle {
     align-items: center;
     background: #090909;
-    border-top: 4px solid #fbf5e7;
     bottom: 0;
     color: #fbf5e7;
     display: flex;
