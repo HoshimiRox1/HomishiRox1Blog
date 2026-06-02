@@ -21,7 +21,7 @@
 - Create `src/components/HomePage.jsx`: Home initial/active states and wheel gesture entry point.
 - Create `src/components/CharacterStage.jsx`: character image/title stage animation.
 - Create `src/components/SidebarAccordion.jsx`: right-side Bauhaus vertical navigation.
-- Create `src/components/PageTransitionOverlay.jsx`: GSAP color-band expand/retract transition.
+- Create `src/components/PageTransitionOverlay.jsx`: GSAP four-band expand/retract transition cloned from the right accordion as one flex track to avoid inter-column gaps.
 - Create `src/components/MarqueeBar.jsx`: bottom continuous text.
 - Create `src/components/BgmPlayer.jsx`: user-triggered play/pause placeholder player.
 - Create `src/components/PlaceholderPage.jsx`: Profile/Portfolio/Blog placeholder content.
@@ -65,7 +65,7 @@
 
 - [ ] Implement four right-side full-height color bands in fixed order: Home, Profile, Portfolio, Blog.
 - [ ] Implement active state from current route as a subtle text-only float/shadow treatment; do not move, filter, mask, or underline the full band.
-- [ ] On click, animate the clicked band as a full-screen overlay, navigate after expansion, then retract.
+- [ ] On click, hide the four band labels in order, expand one cloned flex track from the right rail into equal full-screen columns, navigate after expansion, then reverse back to the rail. The four columns must stay adjacent throughout expansion, with no exposed background gaps.
 - [ ] Implement placeholder page entrance animation and Phase 1 copy.
 
 ## Task 6: Build Marquee and BGM Player

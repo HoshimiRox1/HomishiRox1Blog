@@ -2,9 +2,18 @@
 import { pages } from "../data/site";
 
 // 渲染四条固定顺序的竖向色带。
-export default function SidebarAccordion({ activePageId, onNavigate }) {
+export default function SidebarAccordion({
+  activePageId,
+  isTransitioning,
+  onNavigate,
+}) {
   return (
-    <nav className="sidebar-accordion" aria-label="Main sections">
+    <nav
+      className={`sidebar-accordion ${
+        isTransitioning ? "is-transitioning" : ""
+      }`}
+      aria-label="Main sections"
+    >
       {pages.map((page) => (
         <button
           className={`sidebar-band ${

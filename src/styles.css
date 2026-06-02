@@ -195,11 +195,17 @@ button {
   bottom: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  opacity: 1;
   position: fixed;
   right: 0;
   top: 0;
+  transition: opacity 0ms linear;
   width: var(--sidebar-width);
   z-index: 20;
+}
+
+.sidebar-accordion.is-transitioning {
+  opacity: 0;
 }
 
 .sidebar-band {
@@ -287,21 +293,54 @@ button {
 }
 
 .page-transition-overlay {
-  align-items: center;
-  display: flex;
   inset: 0;
-  justify-content: center;
   opacity: 0;
   pointer-events: none;
   position: fixed;
-  transform: scaleX(0);
   z-index: 30;
 }
 
-.page-transition-overlay span {
-  font-size: clamp(3rem, 12vw, 12rem);
+.transition-band-track {
+  display: flex;
+  overflow: hidden;
+  position: fixed;
+  will-change: width;
+}
+
+.transition-band {
+  align-items: flex-end;
+  background: var(--band-color);
+  color: var(--band-ink);
+  display: flex;
+  flex: 1 0 0;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  padding-bottom: clamp(26px, 5vh, 52px);
+  position: relative;
+}
+
+.transition-band-label {
+  display: block;
+  font-size: clamp(1.4rem, 3.4vw, 3.3rem);
   font-weight: 950;
+  letter-spacing: 0;
+  line-height: 1;
   text-transform: uppercase;
+  transform: rotate(90deg);
+  transform-origin: center;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.transition-band-divider {
+  background: #090909;
+  bottom: 0;
+  left: var(--divider-left);
+  position: absolute;
+  top: 0;
+  width: 4px;
+  z-index: 2;
 }
 
 .placeholder-page {

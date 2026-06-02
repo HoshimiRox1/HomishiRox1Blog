@@ -60,6 +60,7 @@ export default function AppShell() {
       <BgmPlayer isHome={currentPage.id === "home"} />
       <SidebarAccordion
         activePageId={currentPage.id}
+        isTransitioning={Boolean(transition)}
         onNavigate={handleNavigate}
       />
       <PageTransitionOverlay
