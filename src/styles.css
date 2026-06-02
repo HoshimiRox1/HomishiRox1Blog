@@ -224,15 +224,11 @@ button {
 }
 
 .sidebar-band {
-  align-items: flex-end;
   background: var(--band-color);
   border-left: var(--rail-border-width) solid #090909;
   color: var(--band-ink);
-  display: flex;
-  justify-content: center;
   min-width: 0;
   overflow: hidden;
-  padding-bottom: clamp(184px, 29vh, 244px);
   position: relative;
   transition: none;
 }
@@ -248,16 +244,22 @@ button {
 }
 
 .sidebar-band span {
+  --sidebar-label-bottom-safe: clamp(68px, 10vh, 76px);
+  --sidebar-label-width: 6em;
   display: block;
   font-size: clamp(1.4rem, 3.4vw, 3.3rem);
   font-weight: 950;
   letter-spacing: 0;
   line-height: 1;
-  position: relative;
+  position: absolute;
+  right: calc(var(--rail-border-width) + 0.4em);
+  text-align: left;
   text-transform: uppercase;
-  transform: rotate(90deg);
-  transform-origin: center;
+  top: calc(100% - var(--sidebar-label-bottom-safe) - var(--sidebar-label-width));
+  transform: rotate(-90deg);
+  transform-origin: right center;
   white-space: nowrap;
+  width: var(--sidebar-label-width);
   z-index: 1;
 }
 
