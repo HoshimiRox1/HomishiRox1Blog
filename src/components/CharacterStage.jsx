@@ -49,7 +49,10 @@ export default function CharacterStage({ character, isVisible }) {
         style={{ "--character-accent": character.accent }}
       >
         <div className="character-stage-shell">
-          <div className="character-stage-panel" aria-hidden="true">
+          <div
+            className="character-stage-panel"
+            aria-hidden={isVisible ? "true" : "false"}
+          >
             <strong>ROXY STAGE</strong>
             <span />
           </div>

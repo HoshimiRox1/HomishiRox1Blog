@@ -10,7 +10,6 @@ import MarqueeBar from "./MarqueeBar";
 
 // 渲染首页首屏、滚轮状态和角色舞台。
 export default function HomePage() {
-  const containerRef = useRef(null);
   const lockRef = useRef(false);
   const touchStartRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -69,7 +68,6 @@ export default function HomePage() {
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onWheel={handleWheel}
-      ref={containerRef}
     >
       <div className="home-grid" aria-hidden="true" />
       <div className="home-poster">
@@ -82,6 +80,8 @@ export default function HomePage() {
           <br />
           BLOG
         </h1>
+      </div>
+      <div className="home-hint-rail">
         <div className="home-hint-card">
           <strong>SCROLL TO WAKE THE STAGE</strong>
           <span>硬海报标题 + 清爽底色 + 粗野信息条</span>

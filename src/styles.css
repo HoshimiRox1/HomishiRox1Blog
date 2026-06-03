@@ -91,9 +91,12 @@ button {
 
 .home-poster {
   left: clamp(24px, 3vw, 42px);
-  max-width: min(560px, calc(100vw - var(--sidebar-width) - clamp(280px, 28vw, 470px)));
+  width: min(
+    clamp(280px, calc(160px + 24vw), 560px),
+    calc(100vw - var(--sidebar-width) - 250px)
+  );
   position: absolute;
-  top: clamp(24px, calc(120px - 6vw), 70px);
+  top: clamp(24px, calc(-24px + 5vw), 70px);
   z-index: 2;
 }
 
@@ -125,7 +128,7 @@ button {
 
 .home-title {
   color: var(--ink);
-  font-size: clamp(5.8rem, 11vw, 11rem);
+  font-size: clamp(4.8rem, calc(2.5rem + 7.5vw), 11rem);
   font-weight: 950;
   letter-spacing: 0;
   line-height: 0.76;
@@ -134,20 +137,35 @@ button {
   will-change: transform;
 }
 
+.home-hint-rail {
+  --hint-shrink: clamp(0px, calc(1480px - 100vw), 760px);
+  --hint-width: clamp(176px, calc(420px - var(--hint-shrink) * 0.34), 420px);
+  --hint-min-height: clamp(74px, calc(98px - var(--hint-shrink) * 0.032), 98px);
+  --hint-padding-y: clamp(9px, calc(14px - var(--hint-shrink) * 0.007), 14px);
+  --hint-padding-x: clamp(12px, calc(18px - var(--hint-shrink) * 0.008), 18px);
+  --hint-radius: clamp(16px, calc(22px - var(--hint-shrink) * 0.01), 22px);
+  --hint-shadow-offset: clamp(5px, calc(10px - var(--hint-shrink) * 0.007), 10px);
+  bottom: calc(var(--marquee-height) + clamp(118px, calc(-28px + 15vw), 220px));
+  left: clamp(24px, 3vw, 42px);
+  position: fixed;
+  width: min(var(--hint-width), calc(100vw - var(--sidebar-width) - 120px));
+  z-index: 4;
+}
+
 .home-hint-card {
   background: var(--shell-paper);
   border: 4px solid var(--ink);
-  border-radius: 22px;
-  box-shadow: 10px 10px 0 var(--ink);
+  border-radius: var(--hint-radius);
+  box-shadow: var(--hint-shadow-offset) var(--hint-shadow-offset) 0 var(--ink);
   color: var(--ink);
-  margin-top: clamp(20px, calc(34px - 0.6vw), 30px);
-  max-width: min(520px, clamp(250px, calc(100vw - var(--sidebar-width) - 120px), 420px));
-  padding: 14px 18px;
+  min-height: var(--hint-min-height);
+  padding: var(--hint-padding-y) var(--hint-padding-x);
+  width: 100%;
 }
 
 .home-hint-card strong {
   display: block;
-  font-size: clamp(1rem, 1.4vw, 1.28rem);
+  font-size: clamp(0.86rem, calc(1.14rem - var(--hint-shrink) * 0.00038), 1.28rem);
   font-weight: 950;
   line-height: 1.1;
   text-transform: uppercase;
@@ -156,9 +174,9 @@ button {
 .home-hint-card span {
   color: #333333;
   display: block;
-  font-size: clamp(0.84rem, 1vw, 0.98rem);
+  font-size: clamp(0.72rem, calc(0.9rem - var(--hint-shrink) * 0.00022), 0.98rem);
   font-weight: 850;
-  margin-top: 6px;
+  margin-top: clamp(4px, calc(6px - var(--hint-shrink) * 0.003), 6px);
 }
 
 .character-stage {
@@ -213,15 +231,26 @@ button {
   z-index: 6;
 }
 
-.character-stage-panel {
+.character-stage-panel,
+.character-meta {
+  --stage-card-bottom: 18px;
+  --stage-card-left: 18px;
+  --stage-card-right: 18px;
+  --stage-card-padding: 14px;
+  --stage-card-radius: 18px;
+  --stage-card-shadow: 7px;
+  --stage-card-meter-height: 12px;
+  --stage-card-meter-gap: 10px;
+  --stage-card-title-size: clamp(1.25rem, 2vw, 1.86rem);
   background: var(--shell-paper);
   border: 4px solid var(--ink);
-  border-radius: 18px;
-  bottom: 18px;
-  left: 18px;
-  padding: 14px;
+  border-radius: var(--stage-card-radius);
+  bottom: var(--stage-card-bottom);
+  box-shadow: var(--stage-card-shadow) var(--stage-card-shadow) 0 var(--ink);
+  left: var(--stage-card-left);
+  padding: var(--stage-card-padding);
   position: absolute;
-  right: 18px;
+  right: var(--stage-card-right);
   z-index: 3;
 }
 
@@ -230,19 +259,21 @@ button {
   visibility: hidden;
 }
 
-.character-stage-panel strong {
+.character-stage-panel strong,
+.character-meta span {
   display: block;
-  font-size: clamp(1.25rem, 2vw, 1.86rem);
+  font-size: var(--stage-card-title-size);
   font-weight: 950;
   line-height: 1;
 }
 
-.character-stage-panel span {
+.character-stage-panel span,
+.character-meta-meter {
   background: #a8f5d0;
   border: 2px solid var(--ink);
   display: block;
-  height: 12px;
-  margin-top: 10px;
+  height: var(--stage-card-meter-height);
+  margin-top: var(--stage-card-meter-gap);
   width: 100%;
 }
 
@@ -268,24 +299,15 @@ button {
 }
 
 .character-meta {
-  background: var(--shell-paper);
-  border: 4px solid var(--ink);
-  border-radius: 16px;
-  box-shadow: 7px 7px 0 var(--ink);
-  bottom: 98px;
+  --stage-meta-left-shift: clamp(-22px, -1.4vw, -12px);
   color: var(--ink);
-  left: -24px;
+  left: calc(var(--stage-card-left) + var(--stage-meta-left-shift));
   opacity: 0;
-  padding: 10px 12px;
-  position: absolute;
-  right: 34px;
+  right: auto;
+  width: calc(
+    100% - var(--stage-card-right) - (var(--stage-card-left) + var(--stage-meta-left-shift))
+  );
   z-index: 5;
-}
-
-.character-meta span {
-  display: block;
-  font-size: clamp(1rem, 1.4vw, 1.18rem);
-  font-weight: 950;
 }
 
 .character-meta p {
@@ -293,15 +315,6 @@ button {
   font-size: 0.78rem;
   font-weight: 750;
   margin: 2px 0 0;
-}
-
-.character-meta-meter {
-  background: #a8f5d0;
-  border: 2px solid var(--ink);
-  display: block;
-  height: 10px;
-  margin-top: 8px;
-  width: 100%;
 }
 
 .marquee-bar {
@@ -578,21 +591,13 @@ button {
   .home-tags {
     margin-bottom: 42px;
   }
-
-  .home-title {
-    font-size: clamp(4.8rem, 10vw, 7.2rem);
-  }
-
-  .home-hint-card {
-    max-width: min(360px, clamp(220px, calc(100vw - var(--sidebar-width) - 72px), 360px));
-    margin-top: clamp(26px, calc(100vw - 960px), 44px);
-  }
 }
 
 @media (max-width: 760px) {
   .app-shell {
     --rail-border-width: 3px;
     --marquee-height: 48px;
+    --mobile-hud-left: 12px;
     --sidebar-width: 0px;
     --mobile-menu-height: 64px;
   }
@@ -608,7 +613,7 @@ button {
 
   .home-poster {
     left: 18px;
-    max-width: calc(100vw - 36px);
+    width: calc(100vw - 36px);
     right: 18px;
     top: 22px;
   }
@@ -629,12 +634,34 @@ button {
     line-height: 0.78;
   }
 
+  .home-hint-rail {
+    --hint-width: 108px;
+    --hint-min-height: 70px;
+    --hint-padding-y: 8px;
+    --hint-padding-x: 9px;
+    --hint-radius: 14px;
+    --hint-shadow-offset: 5px;
+    bottom: calc(var(--marquee-height) + var(--mobile-menu-height) + 94px);
+    left: var(--mobile-hud-left);
+    position: fixed;
+    width: var(--hint-width);
+  }
+
   .home-hint-card {
     border-width: 3px;
-    box-shadow: 7px 7px 0 var(--ink);
-    margin-top: 18px;
-    max-width: min(88vw, 430px);
-    padding: 12px 14px;
+    margin-top: 0;
+    padding: var(--hint-padding-y) var(--hint-padding-x);
+  }
+
+  .home-hint-card strong {
+    font-size: 0.62rem;
+    line-height: 1.08;
+  }
+
+  .home-hint-card span {
+    font-size: 0.52rem;
+    line-height: 1.15;
+    margin-top: 4px;
   }
 
   .character-stage {
@@ -665,20 +692,6 @@ button {
 
   .character-stage-panel {
     border-width: 3px;
-    border-radius: 14px;
-    bottom: 12px;
-    left: 12px;
-    padding: 9px;
-    right: 12px;
-  }
-
-  .character-stage-panel strong {
-    font-size: 0.92rem;
-  }
-
-  .character-stage-panel span {
-    height: 9px;
-    margin-top: 7px;
   }
 
   .character-figure {
@@ -689,21 +702,29 @@ button {
   }
 
   .character-meta {
+    --stage-card-bottom: 12px;
+    --stage-card-left: 12px;
+    --stage-card-right: 12px;
+    --stage-card-padding: 9px;
+    --stage-card-radius: 14px;
+    --stage-card-shadow: 5px;
+    --stage-card-meter-height: 9px;
+    --stage-card-meter-gap: 7px;
+    --stage-card-title-size: 0.92rem;
+    --stage-meta-left-shift: -12px;
     border-width: 3px;
-    bottom: 48px;
-    box-shadow: 5px 5px 0 var(--ink);
-    left: -66px;
-    padding: 7px 9px;
-    right: 12px;
   }
 
-  .character-meta span {
-    font-size: 0.82rem;
-  }
-
-  .character-meta-meter {
-    height: 8px;
-    margin-top: 6px;
+  .character-stage-panel {
+    --stage-card-bottom: 12px;
+    --stage-card-left: 12px;
+    --stage-card-right: 12px;
+    --stage-card-padding: 9px;
+    --stage-card-radius: 14px;
+    --stage-card-shadow: 5px;
+    --stage-card-meter-height: 9px;
+    --stage-card-meter-gap: 7px;
+    --stage-card-title-size: 0.92rem;
   }
 
   .marquee-bar {
@@ -717,7 +738,7 @@ button {
 
   .bgm-player {
     bottom: calc(var(--mobile-menu-height) + 8px);
-    left: 12px;
+    left: var(--mobile-hud-left);
     border-width: 3px;
     border-radius: 16px;
     box-shadow: 5px 5px 0 var(--ink);

@@ -53,6 +53,15 @@ describe("Home mock alignment", () => {
     cleanup();
   });
 
+  it("keeps the hint card outside the poster flow on desktop layouts", () => {
+    const { container, cleanup } = render(<HomePage />);
+
+    expect(container.querySelector(".home-poster .home-hint-card")).toBeNull();
+    expect(container.querySelector(".home-hint-rail .home-hint-card")).not.toBeNull();
+
+    cleanup();
+  });
+
   it("keeps the title size and hint card position unchanged after entering the stage", () => {
     const previousMatchMedia = window.matchMedia;
     window.matchMedia = () => ({
@@ -111,6 +120,69 @@ describe("Home mock alignment", () => {
       "Test stage title.",
     );
     expect(container.querySelector(".character-meta-meter")).not.toBeNull();
+
+    cleanup();
+  });
+
+  it("keeps the placeholder panel inside the stage shell", () => {
+    const { container, cleanup } = render(
+      <CharacterStage character={character} isVisible={false} />,
+    );
+    const stageShell = container.querySelector(".character-stage-shell");
+    const stagePanel = container.querySelector(".character-stage-panel");
+
+    expect(stageShell).not.toBeNull();
+    expect(stagePanel).not.toBeNull();
+    expect(stageShell?.contains(stagePanel)).toBe(true);
+
+    cleanup();
+  });
+
+  it("keeps the visible meta card outside the placeholder panel structure", () => {
+    const { container, cleanup } = render(
+      <CharacterStage character={character} isVisible />,
+    );
+    const stagePanel = container.querySelector(".character-stage-panel");
+    const metaCard = container.querySelector(".character-meta");
+    const stageShell = container.querySelector(".character-stage-shell");
+
+    expect(stagePanel).not.toBeNull();
+    expect(metaCard).not.toBeNull();
+    expect(stagePanel?.contains(metaCard)).toBe(false);
+    expect(stageShell?.contains(metaCard)).toBe(false);
+
+    cleanup();
+  });
+
+  it("keeps the hint card on a dedicated fixed rail for mobile HUD placement", () => {
+    const { container, cleanup } = render(<HomePage />);
+    const hintRail = container.querySelector(".home-hint-rail");
+
+    expect(hintRail).not.toBeNull();
+    expect(hintRail?.className).not.toContain("static");
+    expect(container.querySelector(".home-poster .home-hint-card")).toBeNull();
+
+    cleanup();
+  });
+
+  it("keeps the mobile hint rail aligned to the bgm left baseline contract", () => {
+    const { container, cleanup } = render(<HomePage />);
+    const hintRail = container.querySelector(".home-hint-rail");
+
+    expect(hintRail).not.toBeNull();
+    expect(hintRail?.getAttribute("style") ?? "").not.toContain("left:");
+
+    cleanup();
+  });
+
+  it("keeps the character meta width independent from the stage right edge", () => {
+    const { container, cleanup } = render(
+      <CharacterStage character={character} isVisible />,
+    );
+    const metaCard = container.querySelector(".character-meta");
+
+    expect(metaCard).not.toBeNull();
+    expect(metaCard?.getAttribute("style") ?? "").not.toContain("right:");
 
     cleanup();
   });
