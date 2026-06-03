@@ -91,9 +91,9 @@ button {
 
 .home-poster {
   left: clamp(24px, 3vw, 42px);
-  max-width: min(560px, calc(100vw - var(--sidebar-width) - 480px));
+  max-width: min(560px, calc(100vw - var(--sidebar-width) - clamp(280px, 28vw, 470px)));
   position: absolute;
-  top: clamp(24px, 3vw, 34px);
+  top: clamp(24px, calc(120px - 6vw), 70px);
   z-index: 2;
 }
 
@@ -140,10 +140,9 @@ button {
   border-radius: 22px;
   box-shadow: 10px 10px 0 var(--ink);
   color: var(--ink);
-  margin-top: clamp(22px, 3vh, 30px);
-  max-width: min(520px, 42vw);
+  margin-top: clamp(20px, calc(34px - 0.6vw), 30px);
+  max-width: min(520px, clamp(250px, calc(100vw - var(--sidebar-width) - 120px), 420px));
   padding: 14px 18px;
-  will-change: opacity, transform;
 }
 
 .home-hint-card strong {
@@ -163,16 +162,18 @@ button {
 }
 
 .character-stage {
-  --stage-height: min(680px, calc(100vh - var(--marquee-height) - 112px));
-  --figure-height: min(calc(var(--stage-height) - 40px), clamp(440px, 68vh, 640px));
-  --shell-height: min(var(--stage-height), calc(var(--figure-height) + 24px));
+  --stage-ceiling: min(680px, calc(100vh - var(--marquee-height) - 112px));
+  --stage-shrink: clamp(0px, calc(1300px - 100vw), 420px);
+  --stage-height: clamp(430px, calc(var(--stage-ceiling) - var(--stage-shrink) * 0.55), var(--stage-ceiling));
+  --figure-height: clamp(406px, calc(var(--stage-height) - clamp(22px, 2.6vw, 40px)), calc(var(--stage-height) - 18px));
+  --shell-height: min(var(--stage-height), calc(var(--figure-height) + clamp(14px, 1.8vw, 24px)));
   bottom: calc(var(--marquee-height) + 36px);
   height: var(--stage-height);
   pointer-events: none;
   position: fixed;
   right: calc(var(--sidebar-width) + clamp(24px, 3.8vw, 58px));
   top: auto;
-  width: clamp(250px, 22vw, 340px);
+  width: clamp(230px, calc(340px - var(--stage-shrink) * 0.22), 340px);
   z-index: 3;
 }
 
@@ -574,10 +575,6 @@ button {
 }
 
 @media (max-width: 1100px) and (min-width: 761px) {
-  .home-poster {
-    max-width: min(430px, calc(100vw - var(--sidebar-width) - 300px));
-  }
-
   .home-tags {
     margin-bottom: 42px;
   }
@@ -587,19 +584,8 @@ button {
   }
 
   .home-hint-card {
-    bottom: calc(var(--marquee-height) + 118px);
-    left: clamp(20px, 3vw, 28px);
-    max-width: 360px;
-    position: fixed;
-    width: min(190px, calc(100vw - var(--sidebar-width) - 280px));
-  }
-
-  .character-stage {
-    --stage-height: min(620px, calc(100vh - var(--marquee-height) - 150px));
-    --figure-height: min(calc(var(--stage-height) - 44px), clamp(430px, 61vh, 560px));
-    --shell-height: min(var(--stage-height), clamp(430px, 54vh, 510px));
-    right: calc(var(--sidebar-width) + 20px);
-    width: clamp(220px, 24vw, 280px);
+    max-width: min(360px, clamp(220px, calc(100vw - var(--sidebar-width) - 72px), 360px));
+    margin-top: clamp(26px, calc(100vw - 960px), 44px);
   }
 }
 

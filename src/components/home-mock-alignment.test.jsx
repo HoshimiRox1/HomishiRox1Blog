@@ -53,6 +53,39 @@ describe("Home mock alignment", () => {
     cleanup();
   });
 
+  it("keeps the title size and hint card position unchanged after entering the stage", () => {
+    const previousMatchMedia = window.matchMedia;
+    window.matchMedia = () => ({
+      matches: true,
+      addEventListener() {},
+      removeEventListener() {},
+    });
+
+    const { container, cleanup } = render(<HomePage />);
+    const title = container.querySelector(".home-title");
+    const hintCard = container.querySelector(".home-hint-card");
+
+    act(() => {
+      container.querySelector(".home-page")?.dispatchEvent(
+        new WheelEvent("wheel", {
+          bubbles: true,
+          deltaY: 120,
+        }),
+      );
+    });
+
+    expect(container.querySelector(".home-page")?.className).toContain(
+      "home-page--staged",
+    );
+    expect(title?.getAttribute("style") ?? "").not.toContain("scale");
+    expect(title?.getAttribute("style") ?? "").not.toContain("transform");
+    expect(hintCard?.getAttribute("style") ?? "").not.toContain("translate");
+    expect(hintCard?.getAttribute("style") ?? "").not.toContain("y:");
+
+    cleanup();
+    window.matchMedia = previousMatchMedia;
+  });
+
   it("keeps the character stage shell visible before the character enters", () => {
     const { container, cleanup } = render(
       <CharacterStage character={character} isVisible={false} />,
