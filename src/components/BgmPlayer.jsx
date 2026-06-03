@@ -8,11 +8,11 @@ export default function BgmPlayer({ isHome }) {
   return (
     <aside className={`bgm-player ${isHome ? "bgm-player--home" : ""}`}>
       <button type="button" onClick={() => setIsPlaying((value) => !value)}>
-        {isPlaying ? "Pause" : "Play"}
+        {isPlaying ? "PAUSE" : "PLAY"}
       </button>
       <div>
         <strong>BGM</strong>
-        <span>{isPlaying ? "播放中" : "等待触发"}</span>
+        <span>{isPlaying ? "PLAYING" : "READY"}</span>
       </div>
     </aside>
   );

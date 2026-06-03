@@ -116,7 +116,7 @@ export default function SidebarAccordion({
             style={{
               "--band-color": page.color,
               "--band-ink": page.ink,
-              "--band-hover-ink": page.id === "home" ? "#090909" : page.color,
+              "--band-hover-ink": page.hoverInk ?? page.color,
             }}
             onClick={() => onNavigate(page)}
             type="button"
@@ -142,7 +142,7 @@ export default function SidebarAccordion({
             style={{
               "--band-color": page.color,
               "--band-ink": page.ink,
-              "--band-hover-ink": page.id === "home" ? "#090909" : page.color,
+              "--band-hover-ink": page.hoverInk ?? page.color,
             }}
             onClick={() => handleMobileBandClick(page)}
             type="button"

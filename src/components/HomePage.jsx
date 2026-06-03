@@ -68,10 +68,10 @@ export default function HomePage() {
       ref={containerRef}
     >
       <div className="home-poster">
-        <p className="home-kicker">PERSONAL SITE / NOTES / MOTION</p>
+        <p className="home-kicker">FRESH BRUTALIST / HOME / STAGE</p>
         <h1 className="home-title">ROXY BLOG</h1>
         <p className="home-copy">
-          黑白海报感主页。第一次滚轮后，标题退到左上，角色从右侧进入舞台。
+          冷白底、粗黑边框和柔和色块组成这座主页舞台。继续滚轮，角色会从右侧色带后方进入。
         </p>
       </div>
 
