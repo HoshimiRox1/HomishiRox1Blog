@@ -26,6 +26,14 @@ const character = {
   image: "test-character.png",
 };
 
+const alternateCharacter = {
+  id: "alternate",
+  name: "备用角色",
+  title: "Alternate stage title.",
+  accent: "#d7fff1",
+  image: "alternate-character.png",
+};
+
 function render(element) {
   const container = document.createElement("div");
   document.body.appendChild(container);
@@ -198,6 +206,31 @@ describe("Home mock alignment", () => {
       "Test stage title.",
     );
     expect(container.querySelector(".character-meta-meter")).not.toBeNull();
+
+    cleanup();
+  });
+
+  it("keeps an independent figure image node for every staged character", () => {
+    const { container, cleanup } = render(
+      <CharacterStage
+        character={character}
+        characters={[character, alternateCharacter]}
+        isVisible
+      />,
+    );
+    const figureImages = container.querySelectorAll(".character-figure img");
+
+    expect(figureImages).toHaveLength(2);
+    expect(
+      container.querySelector("[data-character-id='test'] img")?.getAttribute(
+        "src",
+      ),
+    ).toBe("test-character.png");
+    expect(
+      container
+        .querySelector("[data-character-id='alternate'] img")
+        ?.getAttribute("src"),
+    ).toBe("alternate-character.png");
 
     cleanup();
   });

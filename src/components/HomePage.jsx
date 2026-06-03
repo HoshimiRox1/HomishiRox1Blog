@@ -127,6 +127,7 @@ export default function HomePage() {
 
       <CharacterStage
         character={characters[activeIndex]}
+        characters={characters}
         isVisible={hasEnteredStage}
       />
       <div className="character-preload" aria-hidden="true">
