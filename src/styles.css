@@ -298,6 +298,24 @@ button {
   object-fit: contain;
 }
 
+.character-preload {
+  height: 1px;
+  left: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  width: 1px;
+  z-index: -1;
+}
+
+.character-preload img {
+  display: block;
+  height: 1px;
+  width: 1px;
+}
+
 .character-meta {
   --stage-meta-left-shift: clamp(-22px, -1.4vw, -12px);
   color: var(--ink);

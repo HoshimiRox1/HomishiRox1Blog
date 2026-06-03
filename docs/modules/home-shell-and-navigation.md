@@ -5,6 +5,7 @@
 - 已实现 Vite + React 的 Phase 1 单页应用骨架。
 - Home 初始首屏展示 mock 风格内容区：顶部 `ROXY BLOG` / `ANIME / NOTES / WORK` 双标签、换行大标题、滚轮提示卡、底部滚动文字和右侧空人物舞台壳；首屏不展示角色图。
 - Home 首次滚轮揭示当前角色，后续滚轮按方向在两个角色之间循环切换。
+- Home 会在首屏隐藏预热全部角色图，避免线上冷缓存时首次切到非当前角色出现空白。
 - 已接入 `waifus/珂莱塔-cutout.png` 和 `waifus/洛琪希-cutout.png`。
 - 桌面端右侧常驻 Home / Profile / Portfolio / Blog 四条 FEED 式竖向包豪斯色带。
 - 窄屏端隐藏右侧手风琴，改为底部 Menu 按钮打开四色全屏菜单；菜单四条竖条停在按钮上方，不遮挡按钮。
@@ -70,10 +71,10 @@
 - 转场期间 `.sidebar-accordion.is-transitioning` 提高层级，并把真实 `.sidebar-band` 的背景和边框设为透明：克隆轨道接管色带视觉，真实文字节点仍留在上层参与动画；动画尾段先进入 `is-handoff-ready` 恢复真实色带和黑边，再隐藏克隆轨道，避免交接闪烁和接缝像素偏移。
 - 窄屏转场复用已打开的 `.mobile-menu-band`：点击板块时四条竖条先按从左到右的 stagger 依次上滑消失，退出完成后切换路由并关闭菜单状态；不调用 `PageTransitionOverlay`。
 - 响应式黑边宽度由 `--rail-border-width` 统一控制：桌面为 `4px`，窄屏为 `3px`；桌面真实 `.sidebar-band`、转场 `.transition-band` 和窄屏 `.mobile-menu-band` 必须读取同一变量。
-- `HomePage` 使用 `lockRef` 管理 850ms 滚轮锁，避免一次手势或动画期间连续跳多个角色。
+- `HomePage` 使用 `lockRef` 管理滚轮/触摸切换锁：锁至少覆盖 850ms 入场动画，并在动画期间遇到滚轮惯性或滑动残余时延后到手势空闲后释放，避免一次长滚轮或手机滑动触发多次切换。
 - 首次有效滚轮只从首屏进入角色舞台，不把索引从 0 跳到 1；后续滚轮才调用 `getNextCharacterIndex`。
 - `getNextCharacterIndex` 使用 delta 方向推进一步，并在首尾循环；下滚到末尾后继续从第一个角色入场，不做倒放动画。
-- `CharacterStage` 的粉色舞台壳、`CHARACTER` 标签和 `ROXY STAGE` 面板常驻首屏；角色图和人物 meta 仅在 Home 首次滚轮后入场。人物 meta 只显示角色名和绿色 meter 条，不显示角色描述文本，避免遮挡人物脸部。
+- `CharacterStage` 的粉色舞台壳、`CHARACTER` 标签和 `ROXY STAGE` 面板常驻首屏；角色图和人物 meta 仅在 Home 首次滚轮后入场。人物 meta 只显示角色名和绿色 meter 条，不显示角色描述文本，避免遮挡人物脸部。角色切换前会清理旧 GSAP tween，并把当前角色图按 eager/high priority 请求，降低切换时的闪烁和重叠动画风险。
 - 桌面到平板区间的角色人物、舞台壳和提示卡使用连续的 `clamp()/calc()` 缩放规则同步收缩，避免在约 `1300px` 和 `1100px` 附近出现人物先缩、舞台断崖缩短或提示卡突然下跳。
 - 首次滚轮只负责唤醒舞台与切换人物，不再缩小 `ROXY BLOG` 大标题，也不推动提示卡发生额外位移。
 - Home 左侧信息区已拆成两条独立响应式轨迹：标题继续留在 `home-poster` 海报布局里，提示卡改为桌面/平板独立定位并逐步下沉到 BGM 上方，避免继续被标题缩放和 `1100px` 断点牵着一起跳变。
@@ -95,7 +96,7 @@
 ## 验证和调用方式
 
 - 安装依赖：在项目根目录运行 `npm install`。
-- 自动测试：在项目根目录运行 `npm test`，成功标志为 `src/utils/navigation.test.js` 9 条测试全部通过。
+- 自动测试：在项目根目录运行 `npm test`，成功标志为 `src/utils/navigation.test.js` 和 `src/components/home-mock-alignment.test.jsx` 全部通过。
 - 生产构建：在项目根目录运行 `npm run build`，成功标志为 Vite build exit 0。
 - 本地预览：运行 `npm run dev -- --host 127.0.0.1` 后打开 `http://127.0.0.1:5173/`。
 

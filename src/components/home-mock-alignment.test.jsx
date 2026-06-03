@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { characters } from "../data/site";
 import BgmPlayer from "./BgmPlayer";
 import CharacterStage from "./CharacterStage";
 import HomePage from "./HomePage";
@@ -12,6 +13,10 @@ window.matchMedia = window.matchMedia ?? (() => ({
   addEventListener() {},
   removeEventListener() {},
 }));
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 const character = {
   id: "test",
@@ -93,6 +98,79 @@ describe("Home mock alignment", () => {
 
     cleanup();
     window.matchMedia = previousMatchMedia;
+  });
+
+  it("preloads every character image before the user switches characters", () => {
+    const { container, cleanup } = render(<HomePage />);
+    const preloadImages = container.querySelectorAll(
+      ".character-preload img[data-character-preload='true']",
+    );
+
+    expect(preloadImages).toHaveLength(characters.length);
+    for (const characterItem of characters) {
+      expect(
+        Array.from(preloadImages).some((image) =>
+          image.getAttribute("src")?.includes(characterItem.image),
+        ),
+      ).toBe(true);
+    }
+
+    cleanup();
+  });
+
+  it("keeps inertial wheel events from switching characters after the animation lock window", () => {
+    vi.useFakeTimers();
+    const { container, cleanup } = render(<HomePage />);
+    const homePage = container.querySelector(".home-page");
+
+    act(() => {
+      homePage?.dispatchEvent(
+        new WheelEvent("wheel", {
+          bubbles: true,
+          deltaY: 120,
+        }),
+      );
+    });
+    expect(container.querySelector(".character-meta")?.textContent).toContain(
+      "珂莱塔",
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(820);
+      homePage?.dispatchEvent(
+        new WheelEvent("wheel", {
+          bubbles: true,
+          deltaY: 120,
+        }),
+      );
+      vi.advanceTimersByTime(80);
+      homePage?.dispatchEvent(
+        new WheelEvent("wheel", {
+          bubbles: true,
+          deltaY: 120,
+        }),
+      );
+    });
+
+    expect(container.querySelector(".character-meta")?.textContent).toContain(
+      "珂莱塔",
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(240);
+      homePage?.dispatchEvent(
+        new WheelEvent("wheel", {
+          bubbles: true,
+          deltaY: 120,
+        }),
+      );
+    });
+
+    expect(container.querySelector(".character-meta")?.textContent).toContain(
+      "洛琪希",
+    );
+
+    cleanup();
   });
 
   it("keeps the character stage shell visible before the character enters", () => {

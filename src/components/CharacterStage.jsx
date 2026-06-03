@@ -11,12 +11,16 @@ export default function CharacterStage({ character, isVisible }) {
 
   useGSAP(
     () => {
+      const q = gsap.utils.selector(stageRef);
+      const animatedElements = q(".character-figure, .character-meta");
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      gsap.killTweensOf(animatedElements);
+
       if (!isVisible) {
-        gsap.set(".character-figure, .character-meta", {
+        gsap.set(animatedElements, {
           autoAlpha: 0,
           xPercent: 26,
         });
@@ -24,7 +28,7 @@ export default function CharacterStage({ character, isVisible }) {
       }
 
       gsap.fromTo(
-        ".character-figure, .character-meta",
+        animatedElements,
         { autoAlpha: 0, xPercent: 26, scale: 0.96 },
         {
           autoAlpha: 1,
@@ -32,6 +36,7 @@ export default function CharacterStage({ character, isVisible }) {
           scale: 1,
           duration: reduceMotion ? 0 : 0.82,
           ease: "power3.out",
+          overwrite: "auto",
         },
       );
     },
@@ -59,7 +64,13 @@ export default function CharacterStage({ character, isVisible }) {
         </div>
         <span className="character-stage-label">CHARACTER</span>
         <div className="character-figure" aria-hidden={!isVisible}>
-          <img src={character.image} alt={character.name} />
+          <img
+            decoding="async"
+            fetchPriority="high"
+            loading="eager"
+            src={character.image}
+            alt={character.name}
+          />
         </div>
         <div className="character-meta" aria-hidden={!isVisible}>
           <span>{character.name}</span>
