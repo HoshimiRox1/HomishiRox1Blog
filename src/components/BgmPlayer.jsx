@@ -12,7 +12,7 @@ export default function BgmPlayer({ isHome }) {
       </button>
       <div>
         <strong>BGM</strong>
-        <span>{isPlaying ? "PLAYING" : "READY"}</span>
+        <span>{isPlaying ? "playing" : "user triggered"}</span>
       </div>
     </aside>
   );

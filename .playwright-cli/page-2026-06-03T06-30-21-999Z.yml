@@ -1,0 +1,36 @@
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic "Roxy Blog categories" [ref=e7]:
+          - generic [ref=e8]: ROXY BLOG
+          - generic [ref=e9]: ANIME / NOTES / WORK
+        - heading "ROXY BLOG" [level=1] [ref=e10]:
+          - text: ROXY
+          - text: BLOG
+        - generic [ref=e11]:
+          - strong [ref=e12]: SCROLL TO WAKE THE STAGE
+          - generic [ref=e13]: 硬海报标题 + 清爽底色 + 粗野信息条
+      - complementary:
+        - generic:
+          - generic:
+            - generic:
+              - strong: ROXY STAGE
+          - generic: CHARACTER
+      - generic [ref=e15]:
+        - generic [ref=e16]: ROXY BLOG / FRESH BRUTALIST STAGE / HOME / PROFILE / PORTFOLIO / BLOG /
+        - generic [ref=e17]: ROXY BLOG / FRESH BRUTALIST STAGE / HOME / PROFILE / PORTFOLIO / BLOG /
+  - complementary [ref=e18]:
+    - button "PLAY" [ref=e19] [cursor=pointer]
+    - generic [ref=e20]:
+      - strong [ref=e21]: BGM
+      - generic [ref=e22]: user triggered
+  - navigation "Main sections" [ref=e23]:
+    - button "Home" [ref=e24] [cursor=pointer]:
+      - generic [ref=e25]: Home
+    - button "Profile" [ref=e26] [cursor=pointer]:
+      - generic [ref=e27]: Profile
+    - button "Portfolio" [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]: Portfolio
+    - button "Blog" [ref=e30] [cursor=pointer]:
+      - generic [ref=e31]: Blog

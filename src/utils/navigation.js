@@ -10,6 +10,24 @@ export function getNextCharacterIndex(currentIndex, deltaY, totalCharacters) {
   return nextIndex % totalCharacters;
 }
 
+// 根据触摸滑动方向返回角色切换方向：上/左为上一个，下/右为下一个。
+export function getSwipeCharacterDelta(start, end, threshold = 36) {
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  const absX = Math.abs(deltaX);
+  const absY = Math.abs(deltaY);
+
+  if (Math.max(absX, absY) < threshold) {
+    return 0;
+  }
+
+  if (absX > absY) {
+    return deltaX > 0 ? 1 : -1;
+  }
+
+  return deltaY > 0 ? 1 : -1;
+}
+
 // 根据路径查找页面配置。
 export function getPageByPath(pages, path) {
   return pages.find((page) => page.path === path) ?? pages[0];

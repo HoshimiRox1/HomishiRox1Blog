@@ -16,13 +16,16 @@ export default function CharacterStage({ character, isVisible }) {
       ).matches;
 
       if (!isVisible) {
-        gsap.set(".character-card", { autoAlpha: 0, xPercent: 34 });
+        gsap.set(".character-figure, .character-meta", {
+          autoAlpha: 0,
+          xPercent: 26,
+        });
         return;
       }
 
       gsap.fromTo(
-        ".character-card",
-        { autoAlpha: 0, xPercent: 34, scale: 0.96 },
+        ".character-figure, .character-meta",
+        { autoAlpha: 0, xPercent: 26, scale: 0.96 },
         {
           autoAlpha: 1,
           xPercent: 0,
@@ -41,11 +44,23 @@ export default function CharacterStage({ character, isVisible }) {
       ref={stageRef}
       aria-hidden={!isVisible}
     >
-      <div className="character-card" style={{ "--character-accent": character.accent }}>
-        <img src={character.image} alt={character.name} />
-        <div className="character-meta">
+      <div
+        className="character-card"
+        style={{ "--character-accent": character.accent }}
+      >
+        <div className="character-stage-shell">
+          <div className="character-stage-panel" aria-hidden="true">
+            <strong>ROXY STAGE</strong>
+            <span />
+          </div>
+        </div>
+        <span className="character-stage-label">CHARACTER</span>
+        <div className="character-figure" aria-hidden={!isVisible}>
+          <img src={character.image} alt={character.name} />
+        </div>
+        <div className="character-meta" aria-hidden={!isVisible}>
           <span>{character.name}</span>
-          <p>{character.title}</p>
+          <i className="character-meta-meter" aria-hidden="true" />
         </div>
       </div>
     </aside>

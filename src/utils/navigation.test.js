@@ -3,6 +3,7 @@ import {
   getMobileMenuLabel,
   getNextCharacterIndex,
   getNavigationMode,
+  getSwipeCharacterDelta,
   getPageById,
   getPageByPath,
   shouldUseTransitionOverlay,
@@ -30,6 +31,30 @@ describe("getNextCharacterIndex", () => {
 
   it("wraps from the first character to the last on upward gestures", () => {
     expect(getNextCharacterIndex(0, -100, 3)).toBe(2);
+  });
+});
+
+describe("getSwipeCharacterDelta", () => {
+  it("moves to the next character for downward and rightward swipes", () => {
+    expect(getSwipeCharacterDelta({ x: 20, y: 20 }, { x: 20, y: 120 })).toBe(
+      1,
+    );
+    expect(getSwipeCharacterDelta({ x: 20, y: 20 }, { x: 140, y: 24 })).toBe(
+      1,
+    );
+  });
+
+  it("moves to the previous character for upward and leftward swipes", () => {
+    expect(getSwipeCharacterDelta({ x: 20, y: 120 }, { x: 20, y: 20 })).toBe(
+      -1,
+    );
+    expect(getSwipeCharacterDelta({ x: 140, y: 20 }, { x: 20, y: 24 })).toBe(
+      -1,
+    );
+  });
+
+  it("ignores tiny swipes", () => {
+    expect(getSwipeCharacterDelta({ x: 20, y: 20 }, { x: 38, y: 24 })).toBe(0);
   });
 });
 
