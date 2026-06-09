@@ -55,7 +55,7 @@ Roxy-blog/
 - `docs/DESIGN.md` 是全站设计风格事实来源；涉及页面、组件、动效或视觉调整时必须先阅读并遵守。
 - `docs/Technical-Stack.md` 是技术选型事实来源，确认后不当开发日志反复改写。
 - `docs/TODO.md` 是当前阶段和下一步任务事实来源。
-- 功能模块文档写入 `docs/modules/`，按功能责任划分，不按前端/后端强行拆分。
+- 功能模块文档写入 `docs/modules/`，以 `docs/modules/README.md` 作为索引；通用模块放入 `docs/modules/universal/`，页面专有模块放入对应页面目录，例如 `docs/modules/Home/`、`docs/modules/Profile/`、`docs/modules/Portfolio/`、`docs/modules/Blog/`。按功能责任划分，不按前端/后端强行拆分。
 - 每个 spec 或 slice 验收后，更新 `docs/TODO.md` 和相关模块文档。
 
 ## 7. 开发规则

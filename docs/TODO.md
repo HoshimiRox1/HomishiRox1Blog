@@ -22,14 +22,22 @@
 12. 对齐 `visual-style-hybrid-mockup.html` 的 Home 内容区：双标签、换行大标题、滚轮提示卡、常驻空人物舞台壳、密网格背景和 mock 风格 BGM 卡片。
 13. 平滑化桌面到平板的 Home 舞台响应式：取消滚轮标题缩小，人物/舞台同步缩放，并移除 `1100px` 左右的提示卡和舞台跳变。
 14. 解耦 Home 标题与提示卡的响应式轨迹：标题保留海报缩放趋势，提示卡从约 `1600px` 开始独立下沉并在平板前贴近 BGM 上方。
+15. 拆分 `docs/modules/` 模块文档：以 `README.md` 建立索引，将通用模块归入 `universal/`，将 Home、Profile、Portfolio、Blog 页面专有模块归入各自页面目录，并标记冻结/待扩展状态。
+16. 根据 `2026-06-09-profile-sticky-board-design.md` 将 Profile 占位页升级为章节封面 + Sticky Board 正式页面。
+17. 完成 Profile Sticky Board 一轮 refinement：补齐布局工具、Profile 路由滚动 ownership、identity card 宽度/头像比例/标题单行、胶囊色彩语义与相关测试。
+18. 单点修复 Profile 大屏 Sticky Board 磁贴长条化与内容溢出问题，桌面端贴纸改用稳定视觉尺寸和紧凑内部排版。
 
 ## 下一步任务
 
 1. 为 BGM 接入真实曲目、音量控制和状态持久化。
 2. 补齐 5 个角色 IP 的素材、顺序、标题和配色。
-3. 制定 Profile 正式内容 spec。
-4. 制定 Portfolio 作品滚动擦除切换 spec。
-5. 制定 Blog 四类书架内容系统 spec。
+3. 制定 Portfolio 作品滚动擦除切换 spec。
+4. 制定 Blog 四类书架内容系统 spec。
+5. 为 BGM 接入真实曲目、音量控制和状态持久化后的浏览器验收。
+
+## 已知问题
+
+- 暂无新的已确认视觉阻塞项。
 
 ## 暂不做
 

@@ -7,6 +7,7 @@ import BgmPlayer from "./BgmPlayer";
 import HomePage from "./HomePage";
 import PageTransitionOverlay from "./PageTransitionOverlay";
 import PlaceholderPage from "./PlaceholderPage";
+import ProfilePage from "./ProfilePage";
 import SidebarAccordion from "./SidebarAccordion";
 
 // 组合持久 Shell 与当前路由页面。
@@ -51,10 +52,7 @@ export default function AppShell() {
       <main className="app-main" aria-live="polite">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route
-            path="/profile"
-            element={<PlaceholderPage pageId="profile" />}
-          />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route
             path="/portfolio"
             element={<PlaceholderPage pageId="portfolio" />}

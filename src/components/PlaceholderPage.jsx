@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { pages } from "../data/site";
 import { getPageById } from "../utils/navigation";
+import SectionCover from "./SectionCover";
 
 gsap.registerPlugin(useGSAP);
 
@@ -11,6 +12,7 @@ gsap.registerPlugin(useGSAP);
 export default function PlaceholderPage({ pageId }) {
   const page = useMemo(() => getPageById(pages, pageId), [pageId]);
   const pageRef = useRef(null);
+  const index = `0${pages.findIndex((item) => item.id === page.id) + 1}`;
 
   useGSAP(
     () => {
@@ -33,19 +35,12 @@ export default function PlaceholderPage({ pageId }) {
   );
 
   return (
-    <section className="placeholder-page" ref={pageRef}>
-      <div className="placeholder-content">
-        <p className="placeholder-index">0{pages.findIndex((item) => item.id === page.id) + 1}</p>
-        <h1>{page.title}</h1>
-        <p>{page.description}</p>
-        {page.sections ? (
-          <ul className="blog-sections">
-            {page.sections.map((section) => (
-              <li key={section}>{section}</li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-    </section>
+    <SectionCover
+      description={page.description}
+      index={index}
+      rootRef={pageRef}
+      sections={page.sections}
+      title={page.title}
+    />
   );
 }
