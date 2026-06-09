@@ -22,7 +22,11 @@ export default function ProfileIdentityCard({ profile }) {
           />
         )}
       </div>
-      <h1 className="profile-identity-card__title">{profile.displayName}</h1>
+      <h1 className="profile-identity-card__title">
+        {profile.displayNameLines.map((line) => (
+          <span key={line}>{line}</span>
+        ))}
+      </h1>
       <p>{profile.identityCopy}</p>
     </aside>
   );

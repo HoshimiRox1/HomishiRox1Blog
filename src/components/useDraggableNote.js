@@ -1,8 +1,12 @@
 // 桌面端贴纸拖动状态只保存在内存，刷新后恢复默认布局。
 import { useEffect, useRef, useState } from "react";
 
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
 // 返回指定 note 的 pointer handlers 和 CSS 位移变量。
-export function useDraggableNotes() {
+export function useDraggableNotes(boundaryRef) {
   const [positions, setPositions] = useState({});
   const activeDragRef = useRef(null);
 
@@ -16,8 +20,16 @@ export function useDraggableNotes() {
       setPositions((current) => ({
         ...current,
         [activeDrag.id]: {
-          x: activeDrag.originX + event.clientX - activeDrag.startX,
-          y: activeDrag.originY + event.clientY - activeDrag.startY,
+          x: clamp(
+            activeDrag.originX + event.clientX - activeDrag.startX,
+            activeDrag.minX,
+            activeDrag.maxX,
+          ),
+          y: clamp(
+            activeDrag.originY + event.clientY - activeDrag.startY,
+            activeDrag.minY,
+            activeDrag.maxY,
+          ),
         },
       }));
     }
@@ -52,9 +64,16 @@ export function useDraggableNotes() {
         return;
       }
 
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = "move";
-      }
+      const noteRect = event.currentTarget?.getBoundingClientRect?.();
+      const boundaryRect = boundaryRef?.current?.getBoundingClientRect?.();
+
+      const hasMeasuredBounds =
+        boundaryRect &&
+        noteRect &&
+        boundaryRect.width > 0 &&
+        boundaryRect.height > 0 &&
+        noteRect.width > 0 &&
+        noteRect.height > 0;
 
       activeDragRef.current = {
         id,
@@ -62,6 +81,16 @@ export function useDraggableNotes() {
         startY: event.clientY,
         originX: position.x,
         originY: position.y,
+        minX: hasMeasuredBounds ? -1 * (noteRect.left - boundaryRect.left) : -Infinity,
+        maxX:
+          hasMeasuredBounds
+            ? boundaryRect.right - noteRect.right
+            : Infinity,
+        minY: hasMeasuredBounds ? -1 * (noteRect.top - boundaryRect.top) : -Infinity,
+        maxY:
+          hasMeasuredBounds
+            ? boundaryRect.bottom - noteRect.bottom
+            : Infinity,
       };
     }
 
@@ -71,23 +100,6 @@ export function useDraggableNotes() {
         "--drag-y": `${position.y}px`,
       },
       handlers: {
-        onDrag(event) {
-          if (!activeDragRef.current || event.clientX === 0 || event.clientY === 0) {
-            return;
-          }
-
-          setPositions((current) => ({
-            ...current,
-            [id]: {
-              x: activeDragRef.current.originX + event.clientX - activeDragRef.current.startX,
-              y: activeDragRef.current.originY + event.clientY - activeDragRef.current.startY,
-            },
-          }));
-        },
-        onDragEnd() {
-          activeDragRef.current = null;
-        },
-        onDragStart: startDrag,
         onMouseDown: startDrag,
         onPointerDown: startDrag,
       },

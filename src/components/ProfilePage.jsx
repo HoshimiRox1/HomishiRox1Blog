@@ -8,6 +8,7 @@ import ProfileStickyNote from "./ProfileStickyNote";
 import SectionCover from "./SectionCover";
 import { useDraggableNotes } from "./useDraggableNote";
 import { resolveProfileNoteLayout } from "../utils/profileLayout";
+import { PROFILE_DESKTOP_RESPONSIVE_VARS } from "../utils/profileResponsive";
 
 gsap.registerPlugin(useGSAP);
 
@@ -15,7 +16,8 @@ gsap.registerPlugin(useGSAP);
 export default function ProfilePage() {
   const [isBoardVisible, setIsBoardVisible] = useState(false);
   const pageRef = useRef(null);
-  const { getDragProps } = useDraggableNotes();
+  const whiteboardRef = useRef(null);
+  const { getDragProps } = useDraggableNotes(whiteboardRef);
   const resolvedNoteLayout = resolveProfileNoteLayout(profile.notes);
 
   useGSAP(
@@ -75,29 +77,37 @@ export default function ProfilePage() {
       ref={pageRef}
     >
       {isBoardVisible ? (
-        <div className="profile-board">
-          <ProfileIdentityCard profile={profile} />
-          <div className="profile-note-field">
-            {profile.notes.map((note) => {
-              const layout = resolvedNoteLayout.find((item) => item.id === note.id);
+        <div className="profile-board" style={PROFILE_DESKTOP_RESPONSIVE_VARS}>
+          <section className="profile-whiteboard" ref={whiteboardRef}>
+            <div className="profile-board-title">
+              PROFILE
+              <br />
+              BOARD
+            </div>
+            <div className="profile-board-hint">DRAG NOTES / HOVER TILT</div>
+            <ProfileIdentityCard profile={profile} />
+            <div className="profile-note-field">
+              {profile.notes.map((note) => {
+                const layout = resolvedNoteLayout.find((item) => item.id === note.id);
 
-              return (
-                <ProfileStickyNote
-                  dragProps={getDragProps(note.id)}
-                  key={note.id}
-                  layout={layout}
-                  note={note}
-                />
-              );
-            })}
-          </div>
-          <div className="profile-board-footer">
-            {profile.footerTags.map((tag) => (
-              <span className="profile-pill profile-pill--ink" key={tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
+                return (
+                  <ProfileStickyNote
+                    dragProps={getDragProps(note.id)}
+                    key={note.id}
+                    layout={layout}
+                    note={note}
+                  />
+                );
+              })}
+            </div>
+            <div className="profile-board-footer">
+              {profile.footerTags.map((tag) => (
+                <span className="profile-pill profile-pill--profile" key={tag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </section>
         </div>
       ) : (
         <SectionCover

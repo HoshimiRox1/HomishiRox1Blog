@@ -41,19 +41,19 @@ function render(element) {
 describe("Profile sticky board", () => {
   it("keeps editable profile content in a data object", () => {
     expect(profile.displayName).toBe("HoshimiRox1");
-    expect(profile.avatarSrc).toBe("/assets/profile/avatar.png");
-    expect(profile.notes.map((note) => note.preferredSlot)).toEqual([
-      "top-left",
-      "top-right",
-      "middle-left",
-      "middle-right",
-      "bottom-center",
+    expect(profile.avatarSrc).toContain("Avatar.jpg");
+    expect(profile.notes.map((note) => note.layout.desktop.left)).toEqual([
+      "49%",
+      "43%",
+      "69%",
+      "53%",
+      "73%",
     ]);
     expect(profile.notes.map((note) => note.tone)).toEqual([
       "profile",
       "portfolio",
-      "mint",
       "pink",
+      "mint",
       "paper",
     ]);
     expect(profile.notes.map((note) => note.kicker)).toEqual([
@@ -71,11 +71,12 @@ describe("Profile sticky board", () => {
       <ProfileStickyNote
         layout={{
           style: {
-            "--note-left": "4%",
-            "--note-top": "2%",
-            "--note-width": "36%",
-            "--note-height": "27%",
-            "--note-aspect-ratio": "36 / 27",
+            "--note-left": "49%",
+            "--note-top": "12%",
+            "--note-width": "270px",
+            "--note-min-height": "160px",
+            "--note-rotate": "3deg",
+            "--note-color": "#B9F5FF",
           },
         }}
         note={profile.notes[0]}
@@ -86,6 +87,15 @@ describe("Profile sticky board", () => {
     expect(identity.container.textContent).toContain("PROFILE / 02");
     expect(note.container.textContent).toContain("IDENTITY");
     expect(note.container.textContent).toContain("审美和表达欲先行。");
+    expect(identity.container.querySelector(".profile-avatar img")?.getAttribute("src")).toContain(
+      "Avatar.jpg",
+    );
+    expect(
+      identity.container.querySelectorAll(".profile-identity-card__title span"),
+    ).toHaveLength(2);
+    expect(note.container.querySelector(".profile-note")?.getAttribute("draggable")).not.toBe(
+      "true",
+    );
 
     identity.cleanup();
     note.cleanup();
@@ -157,6 +167,8 @@ describe("Profile sticky board", () => {
 
     expect(container.querySelector(".profile-page--board")).not.toBeNull();
     expect(container.querySelector(".profile-board")).not.toBeNull();
+    expect(container.querySelector(".profile-whiteboard")).not.toBeNull();
+    expect(container.querySelector(".profile-board-title")).not.toBeNull();
     expect(container.textContent).toContain("NOT A RESUME");
 
     cleanup();
@@ -208,16 +220,50 @@ describe("Profile sticky board", () => {
     cleanup();
   });
 
+  it("uses pointer drag only so the browser does not create a native drag ghost", () => {
+    const note = render(
+      <ProfileStickyNote
+        dragProps={{
+          style: {
+            "--drag-x": "0px",
+            "--drag-y": "0px",
+          },
+          handlers: {
+            onPointerDown() {},
+          },
+        }}
+        layout={{
+          style: {
+            "--note-left": "49%",
+            "--note-top": "12%",
+            "--note-width": "270px",
+            "--note-min-height": "160px",
+            "--note-rotate": "3deg",
+            "--note-color": "#B9F5FF",
+          },
+        }}
+        note={profile.notes[0]}
+      />,
+    );
+
+    const article = note.container.querySelector(".profile-note");
+
+    expect(article?.getAttribute("draggable")).not.toBe("true");
+
+    note.cleanup();
+  });
+
   it("renders sticky note pills with semantic tone classes", () => {
     const loadout = render(
       <ProfileStickyNote
         layout={{
           style: {
-            "--note-left": "48%",
-            "--note-top": "6%",
-            "--note-width": "31%",
-            "--note-height": "24%",
-            "--note-aspect-ratio": "31 / 24",
+            "--note-left": "43%",
+            "--note-top": "45%",
+            "--note-width": "230px",
+            "--note-min-height": "160px",
+            "--note-rotate": "-3deg",
+            "--note-color": "#FFE7A6",
           },
         }}
         note={profile.notes[1]}
@@ -227,11 +273,12 @@ describe("Profile sticky board", () => {
       <ProfileStickyNote
         layout={{
           style: {
-            "--note-left": "36%",
-            "--note-top": "70%",
-            "--note-width": "27%",
-            "--note-height": "20%",
-            "--note-aspect-ratio": "27 / 20",
+            "--note-left": "73%",
+            "--note-top": "69%",
+            "--note-width": "250px",
+            "--note-min-height": "120px",
+            "--note-rotate": "-2deg",
+            "--note-color": "#D8CCFF",
           },
         }}
         note={profile.notes[4]}
@@ -277,12 +324,13 @@ describe("Profile sticky board", () => {
     expect(notes).toHaveLength(5);
     expect(noteStyles.every((style) => style.includes("--note-left"))).toBe(true);
     expect(noteStyles.every((style) => style.includes("--note-width"))).toBe(true);
-    expect(noteStyles.every((style) => style.includes("--note-height"))).toBe(true);
-    expect(noteStyles.every((style) => style.includes("--note-aspect-ratio"))).toBe(
+    expect(noteStyles.every((style) => style.includes("--note-min-height"))).toBe(
       true,
     );
+    expect(noteStyles.every((style) => style.includes("--note-rotate"))).toBe(true);
+    expect(noteStyles.every((style) => style.includes("--note-color"))).toBe(true);
     expect(new Set(noteStyles.map((style) => style.match(/--note-tone: ([^;]+)/)?.[1]))).toEqual(
-      new Set(["profile", "portfolio", "mint", "pink", "paper"]),
+      new Set(["profile", "portfolio", "pink", "mint", "paper"]),
     );
 
     cleanup();
@@ -302,16 +350,19 @@ describe("Profile sticky board", () => {
     cleanup();
   });
 
-  it("keeps the identity display name as a single readable line", () => {
+  it("renders the identity display name as two stacked preview-aligned lines", () => {
     const { container, cleanup } = render(<ProfileIdentityCard profile={profile} />);
     const title = container.querySelector(".profile-identity-card__title");
     const metaPills = Array.from(
       container.querySelectorAll(".profile-identity-card__meta .profile-pill"),
     ).map((pill) => pill.className);
+    const titleLines = Array.from(
+      container.querySelectorAll(".profile-identity-card__title span"),
+    ).map((line) => line.textContent);
 
     expect(title).not.toBeNull();
-    expect(title?.textContent).toBe("HoshimiRox1");
-    expect(container.querySelectorAll(".profile-identity-card__title span")).toHaveLength(0);
+    expect(title?.textContent?.replace(/\s+/g, "")).toBe("HoshimiRox1");
+    expect(titleLines).toEqual(["Hoshimi", "Rox1"]);
     expect(metaPills).toEqual([
       "profile-pill profile-pill--profile",
       "profile-pill profile-pill--paper",
@@ -333,6 +384,20 @@ describe("Profile sticky board", () => {
         note.getAttribute("data-note-id"),
       ),
     ).toEqual(["identity", "loadout", "taste", "current-quest", "links"]);
+
+    cleanup();
+  });
+
+  it("keeps the whiteboard content independent from the global sidebar nav", () => {
+    const { container, cleanup } = render(<ProfilePage />);
+    const page = container.querySelector(".profile-page");
+
+    act(() => {
+      page?.dispatchEvent(new WheelEvent("wheel", { bubbles: true, deltaY: 120 }));
+    });
+
+    expect(container.querySelector(".profile-whiteboard")).not.toBeNull();
+    expect(container.querySelector(".profile-side-bands")).toBeNull();
 
     cleanup();
   });

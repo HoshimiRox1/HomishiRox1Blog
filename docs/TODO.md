@@ -26,6 +26,8 @@
 16. 根据 `2026-06-09-profile-sticky-board-design.md` 将 Profile 占位页升级为章节封面 + Sticky Board 正式页面。
 17. 完成 Profile Sticky Board 一轮 refinement：补齐布局工具、Profile 路由滚动 ownership、identity card 宽度/头像比例/标题单行、胶囊色彩语义与相关测试。
 18. 单点修复 Profile 大屏 Sticky Board 磁贴长条化与内容溢出问题，桌面端贴纸改用稳定视觉尺寸和紧凑内部排版。
+19. 根据 `2026-06-09-profile-preview-alignment-design.md` 将 Profile 桌面白板重构为 preview 对齐版本：整块 whiteboard、浅青身份卡、Avatar 资源切换、固定磁贴 preset 和内部 side-bands。
+20. 收敛 Profile 响应式阈值：桌面身份卡改为统一响应 token 联动缩放，并将手机态阈值从 `760px` 提前到 `830px`，同步沉淀通用响应式分段文档。
 
 ## 下一步任务
 

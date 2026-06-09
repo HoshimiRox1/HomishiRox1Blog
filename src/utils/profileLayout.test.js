@@ -1,56 +1,107 @@
 import { describe, expect, it } from "vitest";
-import {
-  doRectsOverlap,
-  resolveProfileNoteLayout,
-} from "./profileLayout";
+import { resolveProfileNoteLayout } from "./profileLayout";
 
 const notes = [
-  { id: "identity", size: "large", preferredSlot: "top-left" },
-  { id: "loadout", size: "medium", preferredSlot: "top-right" },
-  { id: "taste", size: "medium", preferredSlot: "middle-left" },
-  { id: "current-quest", size: "large", preferredSlot: "middle-right" },
-  { id: "links", size: "small", preferredSlot: "bottom-center" },
+  {
+    id: "identity",
+    layout: {
+      desktop: {
+        left: "49%",
+        top: "12%",
+        width: "270px",
+        minHeight: "160px",
+        rotate: "3deg",
+        background: "#B9F5FF",
+      },
+    },
+  },
+  {
+    id: "loadout",
+    layout: {
+      desktop: {
+        left: "43%",
+        top: "45%",
+        width: "230px",
+        minHeight: "160px",
+        rotate: "-3deg",
+        background: "#FFE7A6",
+      },
+    },
+  },
+  {
+    id: "taste",
+    layout: {
+      desktop: {
+        left: "69%",
+        top: "36%",
+        width: "230px",
+        minHeight: "160px",
+        rotate: "4deg",
+        background: "#FFD6E8",
+      },
+    },
+  },
+  {
+    id: "current-quest",
+    layout: {
+      desktop: {
+        left: "53%",
+        top: "63%",
+        width: "255px",
+        minHeight: "160px",
+        rotate: "2deg",
+        background: "#D7FFF1",
+      },
+    },
+  },
+  {
+    id: "links",
+    layout: {
+      desktop: {
+        left: "73%",
+        top: "69%",
+        width: "250px",
+        minHeight: "120px",
+        rotate: "-2deg",
+        background: "#D8CCFF",
+      },
+    },
+  },
 ];
 
 describe("profile note layout", () => {
-  it("places all notes without overlapping their default rectangles", () => {
+  it("emits one preset layout object per note", () => {
     const layout = resolveProfileNoteLayout(notes);
 
     expect(layout).toHaveLength(notes.length);
-
-    for (let leftIndex = 0; leftIndex < layout.length; leftIndex += 1) {
-      for (let rightIndex = leftIndex + 1; rightIndex < layout.length; rightIndex += 1) {
-        expect(
-          doRectsOverlap(layout[leftIndex].rect, layout[rightIndex].rect),
-        ).toBe(false);
-      }
-    }
+    expect(layout.map((item) => item.id)).toEqual([
+      "identity",
+      "loadout",
+      "taste",
+      "current-quest",
+      "links",
+    ]);
   });
 
   it("is deterministic for the same note order and metadata", () => {
     expect(resolveProfileNoteLayout(notes)).toEqual(resolveProfileNoteLayout(notes));
   });
 
-  it("keeps every note inside the desktop board coordinate system", () => {
-    const layout = resolveProfileNoteLayout(notes);
-
-    for (const item of layout) {
-      expect(item.rect.x).toBeGreaterThanOrEqual(0);
-      expect(item.rect.y).toBeGreaterThanOrEqual(0);
-      expect(item.rect.x + item.rect.width).toBeLessThanOrEqual(100);
-      expect(item.rect.y + item.rect.height).toBeLessThanOrEqual(100);
-    }
-  });
-
-  it("emits stable desktop note dimensions separate from placement percentages", () => {
+  it("maps desktop presets to the CSS variable contract used by sticky notes", () => {
     const layout = resolveProfileNoteLayout(notes);
     const byId = Object.fromEntries(layout.map((item) => [item.id, item.style]));
 
-    expect(byId.identity["--note-desktop-width"]).toBe("clamp(200px, 14vw, 270px)");
-    expect(byId.identity["--note-desktop-min-height"]).toBe(
-      "clamp(160px, 11vw, 218px)",
-    );
-    expect(byId.loadout["--note-desktop-width"]).toBe("clamp(188px, 12vw, 240px)");
-    expect(byId.links["--note-desktop-width"]).toBe("clamp(176px, 11vw, 230px)");
+    expect(byId.identity).toEqual({
+      "--note-left": "49%",
+      "--note-top": "12%",
+      "--note-width": "270px",
+      "--note-min-height": "160px",
+      "--note-rotate": "3deg",
+      "--note-color": "#B9F5FF",
+    });
+    expect(byId.loadout["--note-left"]).toBe("43%");
+    expect(byId.taste["--note-color"]).toBe("#FFD6E8");
+    expect(byId["current-quest"]["--note-width"]).toBe("255px");
+    expect(byId.links["--note-min-height"]).toBe("120px");
   });
 });

@@ -4,17 +4,13 @@ export default function ProfileStickyNote({ note, layout, dragProps = {} }) {
     <article
       className={`profile-note profile-note--${note.size} profile-board-panel`}
       data-note-id={note.id}
-      draggable={Boolean(dragProps.handlers)}
       style={{
-        "--note-color": note.color,
         "--note-left": layout?.style["--note-left"],
         "--note-top": layout?.style["--note-top"],
         "--note-width": layout?.style["--note-width"],
-        "--note-height": layout?.style["--note-height"],
-        "--note-aspect-ratio": layout?.style["--note-aspect-ratio"],
-        "--note-desktop-width": layout?.style["--note-desktop-width"],
-        "--note-desktop-min-height": layout?.style["--note-desktop-min-height"],
-        "--note-rotate": `${note.rotate}deg`,
+        "--note-min-height": layout?.style["--note-min-height"],
+        "--note-rotate": layout?.style["--note-rotate"],
+        "--note-color": layout?.style["--note-color"],
         "--note-tone": note.tone,
         ...dragProps.style,
       }}

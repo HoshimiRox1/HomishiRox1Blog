@@ -601,6 +601,10 @@ button {
 .profile-page {
   background: var(--shell-bg);
   color: var(--ink);
+  font-family:
+    Arial,
+    "Microsoft YaHei",
+    sans-serif;
   min-height: 100vh;
   overflow: hidden;
   position: relative;
@@ -610,42 +614,85 @@ button {
   background-image:
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
     linear-gradient(180deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 36px 36px;
+  background-size: 24px 24px;
 }
 
 .profile-board {
-  --profile-card-edge: clamp(24px, 4vw, 48px);
-  display: grid;
-  gap: clamp(20px, 3vw, 34px);
-  grid-template-columns: minmax(360px, 420px) minmax(420px, 1fr);
+  --profile-board-edge: 28px;
+  --profile-card-width: 430px;
+  --profile-avatar-size: 374px;
+  --profile-identity-title-size: 68px;
+  --profile-footer-offset: calc(var(--profile-card-width) + 54px);
   min-height: 100vh;
-  padding: var(--profile-card-edge);
-  padding-right: calc(var(--sidebar-width) + clamp(24px, 4vw, 52px));
-  position: relative;
+  padding: var(--profile-board-edge);
+  padding-right: clamp(10px, 1vw, 16px);
 }
 
 .profile-board-panel {
   opacity: 0;
 }
 
-.profile-identity-card {
-  align-self: start;
-  background: var(--shell-paper);
-  border: 5px solid var(--ink);
+.profile-whiteboard {
+  background:
+    linear-gradient(rgba(17, 17, 17, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.055) 1px, transparent 1px),
+    var(--shell-paper);
+  background-size: 32px 32px;
+  border: 6px solid var(--ink);
   border-radius: 28px;
-  box-shadow: 12px 12px 0 var(--ink);
+  min-height: calc(100vh - var(--profile-board-edge) * 2);
+  overflow: hidden;
+  position: relative;
+}
+
+.profile-board-title {
+  font-size: clamp(58px, 9vw, 132px);
+  font-weight: 1000;
+  left: 24px;
+  letter-spacing: 0;
+  line-height: 0.8;
+  max-width: 540px;
+  pointer-events: none;
+  position: absolute;
+  top: 20px;
+  z-index: 1;
+}
+
+.profile-board-hint {
+  background: var(--shell-paper);
+  border: 4px solid var(--ink);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  padding: 7px 11px;
+  position: absolute;
+  right: 28px;
+  top: 24px;
+  z-index: 6;
+}
+
+.profile-identity-card {
+  background: var(--profile-band);
+  border: 6px solid var(--ink);
+  border-radius: 30px;
+  box-shadow: 10px 10px 0 var(--ink);
   display: grid;
-  grid-template-rows: auto minmax(150px, 1fr) auto auto;
-  height: calc(100vh - var(--profile-card-edge) * 2);
-  min-height: 0;
-  padding: clamp(18px, 2.4vw, 28px);
-  position: sticky;
-  top: var(--profile-card-edge);
+  gap: 18px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  height: calc(100% - 56px);
+  left: 28px;
+  min-width: 330px;
+  padding: 22px;
+  position: absolute;
+  top: 28px;
+  width: min(var(--profile-card-width), calc(100% - 56px));
+  z-index: 4;
 }
 
 .profile-identity-card__meta {
+  align-items: center;
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
   justify-content: space-between;
 }
@@ -691,16 +738,18 @@ button {
 .profile-avatar {
   aspect-ratio: 1 / 1;
   align-items: center;
-  background: var(--profile-band);
-  border: 4px solid var(--ink);
-  border-radius: 22px;
+  background: var(--shell-paper);
+  border: 6px solid var(--ink);
+  border-radius: 26px;
   display: flex;
   font-size: clamp(2.6rem, 7vw, 5rem);
   font-weight: 950;
   justify-content: center;
-  margin: clamp(26px, 4vw, 44px) 0;
-  min-height: 0;
-  width: 100%;
+  justify-self: center;
+  margin: 0;
+  min-height: 260px;
+  min-width: 0;
+  width: min(100%, var(--profile-avatar-size));
   overflow: hidden;
 }
 
@@ -712,75 +761,93 @@ button {
 }
 
 .profile-identity-card__title {
-  font-size: clamp(2rem, 2.2vw, 2.9rem);
+  display: grid;
+  font-size: var(--profile-identity-title-size);
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 1;
+  line-height: 0.82;
   margin: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
   text-transform: uppercase;
-  white-space: nowrap;
+}
+
+.profile-identity-card__title span {
+  display: block;
 }
 
 .profile-identity-card p {
   color: var(--muted-ink);
-  font-size: clamp(1rem, 1.5vw, 1.18rem);
-  font-weight: 850;
-  margin: 22px 0 0;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.35;
+  margin: 12px 0 0;
+  max-width: 310px;
 }
 
 .profile-note-field {
-  height: calc(100vh - var(--profile-card-edge) * 2);
-  min-height: calc(100vh - 96px);
-  position: relative;
+  inset: 0;
+  position: absolute;
 }
 
 .profile-note {
   aspect-ratio: auto;
   background: var(--note-color);
-  border: 4px solid var(--ink);
+  border: 5px solid var(--ink);
   border-radius: 0;
   cursor: grab;
   display: flex;
   flex-direction: column;
-  left: min(var(--note-left), calc(100% - var(--note-desktop-width)));
-  min-height: var(--note-desktop-min-height);
-  padding: clamp(14px, 1.3vw, 18px);
+  left: var(--note-left);
+  min-height: var(--note-min-height);
+  padding: 16px;
   position: absolute;
   top: var(--note-top);
   touch-action: none;
   transform:
     translate(var(--drag-x, 0), var(--drag-y, 0))
     rotate(var(--note-rotate));
-  transition: transform 0.16s ease;
+  transition:
+    filter 160ms ease,
+    transform 180ms ease;
   user-select: none;
-  width: var(--note-desktop-width);
+  width: var(--note-width);
+  z-index: 5;
 }
 
 .profile-note:active {
   cursor: grabbing;
+  filter: saturate(1.05);
+  z-index: 20;
+}
+
+.profile-note:hover {
+  --note-hover-rotate: 2deg;
+  transform:
+    translate(var(--drag-x, 0), var(--drag-y, 0))
+    rotate(calc(var(--note-rotate) + var(--note-hover-rotate, 0deg)));
+}
+
+.profile-note:nth-child(odd):hover {
+  --note-hover-rotate: -2deg;
 }
 
 .profile-note__kicker {
   display: block;
-  font-size: 0.74rem;
+  font-size: 11px;
   font-weight: 950;
   text-align: right;
 }
 
 .profile-note h2 {
-  font-size: clamp(1.28rem, 1.55vw, 1.9rem);
+  font-size: 28px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 1.05;
-  margin: 14px 0 0;
+  line-height: 0.95;
+  margin: 12px 0 0;
 }
 
 .profile-note p {
   color: #262626;
-  font-size: 0.86rem;
+  font-size: 14px;
   font-weight: 800;
   line-height: 1.35;
   margin: 12px 0 0;
@@ -790,14 +857,15 @@ button {
 .profile-note__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
   list-style: none;
   margin: 13px 0 0;
   padding: 0;
 }
 
 .profile-note .profile-pill {
-  font-size: 0.68rem;
+  font-size: 11px;
+  font-weight: 1000;
   padding: 7px 8px;
 }
 
@@ -805,11 +873,11 @@ button {
   bottom: 24px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  left: clamp(420px, 35vw, 520px);
-  position: fixed;
-  right: calc(var(--sidebar-width) + 24px);
-  z-index: 10;
+  gap: 8px;
+  left: var(--profile-footer-offset);
+  position: absolute;
+  right: 24px;
+  z-index: 3;
 }
 
 @keyframes marquee {
@@ -851,24 +919,51 @@ button {
   }
 
   .profile-board {
-    grid-template-columns: 1fr;
     min-height: 100vh;
     overflow: visible;
     padding-bottom: calc(var(--mobile-menu-height) + 128px);
     padding-right: clamp(20px, 5vw, 34px);
   }
 
+  .profile-whiteboard {
+    min-height: auto;
+    overflow: visible;
+    padding: clamp(20px, 5vw, 24px);
+  }
+
+  .profile-board-title,
+  .profile-board-hint {
+    position: static;
+  }
+
+  .profile-board-title {
+    margin-bottom: 10px;
+    max-width: none;
+  }
+
+  .profile-board-hint {
+    display: inline-flex;
+    margin-bottom: 18px;
+  }
+
   .profile-identity-card {
     min-height: auto;
     position: relative;
+    inset: auto;
     top: auto;
+    width: 100%;
+    min-width: 0;
+    height: auto;
   }
 
   .profile-note-field {
     display: grid;
     gap: 16px;
     height: auto;
+    inset: auto;
     min-height: auto;
+    position: relative;
+    margin-top: 18px;
   }
 
   .profile-note {
@@ -881,6 +976,7 @@ button {
     touch-action: auto;
     transform: rotate(var(--note-rotate));
     width: min(100%, 560px);
+    min-height: auto;
   }
 
   .profile-note h2 {
@@ -916,12 +1012,13 @@ button {
   .profile-board-footer {
     bottom: auto;
     left: auto;
+    margin-top: 18px;
     position: static;
     right: auto;
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 830px) {
   .app-shell {
     --rail-border-width: 3px;
     --marquee-height: 48px;

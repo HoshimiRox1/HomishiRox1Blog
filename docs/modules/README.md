@@ -12,6 +12,7 @@ docs/modules/
 │  ├─ site-data-and-navigation-utils.md
 │  ├─ navigation-page-transition.md
 │  ├─ responsive-navigation.md
+│  ├─ responsive-layout-thresholds.md
 │  └─ bgm-player.md
 ├─ Home/
 │  ├─ home-poster-page.md
@@ -34,6 +35,7 @@ docs/modules/
 | 全站数据与导航纯函数 | `docs/modules/universal/site-data-and-navigation-utils.md` | 已实现，稳定 |
 | 桌面侧栏色带导航与页面转场 | `docs/modules/universal/navigation-page-transition.md` | 已实现，冻结 |
 | 响应式导航与移动端 Menu | `docs/modules/universal/responsive-navigation.md` | 已实现，冻结 |
+| 响应式分段与联动缩放原则 | `docs/modules/universal/responsive-layout-thresholds.md` | 已沉淀，供后续页面复用 |
 | BGM 播放器 | `docs/modules/universal/bgm-player.md` | Phase 1 已实现，待接真实音频 |
 
 ## 页面专有模块
