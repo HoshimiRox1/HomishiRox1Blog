@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roxy Profile Sticky Board Preview</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: #111;
+        font-family:
+          Arial,
+          "Microsoft YaHei",
+          sans-serif;
+        background:
+          linear-gradient(rgba(17, 17, 17, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(17, 17, 17, 0.05) 1px, transparent 1px),
+          #f7fbff;
+        background-size: 24px 24px;
+        overflow: hidden;
+      }
+
+      .board-shell {
+        min-height: 100vh;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 76px;
+        gap: 18px;
+      }
+
+      .whiteboard {
+        position: relative;
+        min-height: calc(100vh - 56px);
+        border: 6px solid #111;
+        background:
+          linear-gradient(rgba(17, 17, 17, 0.055) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(17, 17, 17, 0.055) 1px, transparent 1px),
+          #fff;
+        background-size: 32px 32px;
+        overflow: hidden;
+      }
+
+      .board-title {
+        position: absolute;
+        left: 24px;
+        top: 20px;
+        z-index: 1;
+        max-width: 540px;
+        font-size: clamp(58px, 9vw, 132px);
+        line-height: 0.8;
+        font-weight: 1000;
+        letter-spacing: 0;
+        pointer-events: none;
+      }
+
+      .identity-card {
+        position: absolute;
+        left: 28px;
+        top: 28px;
+        z-index: 4;
+        width: min(38vw, 430px);
+        min-width: 330px;
+        height: calc(100% - 56px);
+        border: 6px solid #111;
+        background: #b9f5ff;
+        padding: 22px;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: 18px;
+      }
+
+      .identity-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .identity-index {
+        border: 4px solid #111;
+        background: #fff;
+        padding: 7px 9px;
+        font-size: 13px;
+        line-height: 1;
+        font-weight: 1000;
+      }
+
+      .avatar-box {
+        position: relative;
+        border: 6px solid #111;
+        background: #fff;
+        min-height: 260px;
+        display: grid;
+        place-items: center;
+        font-size: 64px;
+        font-weight: 1000;
+        overflow: hidden;
+      }
+
+      .avatar-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .identity-card h2 {
+        margin: 0;
+        font-size: clamp(54px, 6vw, 86px);
+        line-height: 0.82;
+        font-weight: 1000;
+        letter-spacing: 0;
+      }
+
+      .identity-card p {
+        margin: 12px 0 0;
+        max-width: 310px;
+        font-size: 15px;
+        line-height: 1.35;
+        font-weight: 900;
+      }
+
+      .board-meta {
+        position: absolute;
+        left: calc(min(38vw, 430px) + 54px);
+        bottom: 24px;
+        z-index: 3;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        pointer-events: none;
+      }
+
+      .meta-chip {
+        border: 4px solid #111;
+        background: #b9f5ff;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1;
+        font-weight: 1000;
+      }
+
+      .sticky {
+        position: absolute;
+        z-index: 5;
+        width: 230px;
+        min-height: 160px;
+        border: 5px solid #111;
+        padding: 16px;
+        cursor: grab;
+        user-select: none;
+        transform: translate(var(--tx), var(--ty)) rotate(calc(var(--r) + var(--hr)));
+        transition:
+          filter 160ms ease,
+          transform 180ms ease;
+        touch-action: none;
+        --hr: 0deg;
+      }
+
+      .sticky:hover {
+        --hr: 2deg;
+      }
+
+      .sticky:nth-of-type(odd):hover {
+        --hr: -2deg;
+      }
+
+      .sticky:active {
+        cursor: grabbing;
+        z-index: 20;
+        filter: saturate(1.05);
+      }
+
+      .sticky::before {
+        content: none;
+      }
+
+      .sticky-label {
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: flex-end;
+        font-size: 11px;
+        line-height: 1;
+        font-weight: 1000;
+      }
+
+      .sticky h2 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 0.95;
+        font-weight: 1000;
+        letter-spacing: 0;
+      }
+
+      .sticky p {
+        margin: 12px 0 0;
+        font-size: 14px;
+        line-height: 1.35;
+        font-weight: 800;
+      }
+
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 14px;
+      }
+
+      .tag {
+        border: 3px solid #111;
+        background: #fff;
+        padding: 5px 7px;
+        font-size: 11px;
+        line-height: 1;
+        font-weight: 1000;
+      }
+
+      .mini-card {
+        border: 3px solid #111;
+        background: #fff;
+        padding: 8px;
+        font-size: 12px;
+        line-height: 1.2;
+        font-weight: 1000;
+      }
+
+      .sticky[data-note="intro"] {
+        left: 49%;
+        top: 12%;
+        width: 270px;
+        background: #b9f5ff;
+        --tx: 0px;
+        --ty: 0px;
+        --r: 3deg;
+      }
+
+      .sticky[data-note="stack"] {
+        left: 43%;
+        top: 45%;
+        background: #ffe7a6;
+        --tx: 0px;
+        --ty: 0px;
+        --r: -3deg;
+      }
+
+      .sticky[data-note="taste"] {
+        left: 69%;
+        top: 36%;
+        background: #ffd6e8;
+        --tx: 0px;
+        --ty: 0px;
+        --r: 4deg;
+      }
+
+      .sticky[data-note="quest"] {
+        left: 53%;
+        top: 63%;
+        width: 255px;
+        background: #d7fff1;
+        --tx: 0px;
+        --ty: 0px;
+        --r: 2deg;
+      }
+
+      .sticky[data-note="contact"] {
+        left: 73%;
+        top: 69%;
+        width: 250px;
+        min-height: 120px;
+        background: #d8ccff;
+        --tx: 0px;
+        --ty: 0px;
+        --r: -2deg;
+      }
+
+      .side-bands {
+        display: grid;
+        grid-template-rows: repeat(4, 1fr);
+        border: 5px solid #111;
+      }
+
+      .band {
+        writing-mode: vertical-rl;
+        display: grid;
+        place-items: center;
+        border-bottom: 5px solid #111;
+        font-size: 16px;
+        font-weight: 1000;
+      }
+
+      .band:last-child {
+        border-bottom: 0;
+      }
+
+      .band.home {
+        background: #d8ccff;
+      }
+
+      .band.profile {
+        background: #b9f5ff;
+      }
+
+      .band.portfolio {
+        background: #ffe7a6;
+      }
+
+      .band.blog {
+        background: #c7f2d4;
+      }
+
+      .hint {
+        position: absolute;
+        right: 24px;
+        top: 22px;
+        z-index: 2;
+        border: 4px solid #111;
+        background: #111;
+        color: #fff;
+        padding: 10px 12px;
+        font-size: 12px;
+        line-height: 1;
+        font-weight: 1000;
+        pointer-events: none;
+      }
+
+      @media (max-width: 900px) {
+        body {
+          overflow: auto;
+        }
+
+        .board-shell {
+          display: block;
+          padding: 16px;
+        }
+
+        .whiteboard {
+          min-height: 1180px;
+        }
+
+        .side-bands {
+          display: none;
+        }
+
+        .board-title {
+          font-size: 64px;
+        }
+
+        .identity-card {
+          left: 18px;
+          top: 132px;
+          width: calc(100% - 36px);
+          min-width: 0;
+          height: 360px;
+        }
+
+        .avatar-box {
+          min-height: 120px;
+        }
+
+        .board-meta {
+          left: 18px;
+          right: 18px;
+          bottom: 18px;
+        }
+
+        .sticky {
+          width: 220px;
+        }
+
+        .sticky[data-note="intro"] {
+          left: 18px;
+          top: 540px;
+        }
+
+        .sticky[data-note="stack"] {
+          left: 118px;
+          top: 710px;
+        }
+
+        .sticky[data-note="taste"] {
+          left: 28px;
+          top: 875px;
+        }
+
+        .sticky[data-note="quest"] {
+          left: 118px;
+          top: 1010px;
+        }
+
+        .sticky[data-note="contact"] {
+          left: 28px;
+          top: 1045px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="board-shell">
+      <section class="whiteboard" id="board">
+        <div class="board-title">PROFILE<br />BOARD</div>
+        <div class="hint">DRAG NOTES / HOVER TILT</div>
+
+        <section class="identity-card">
+          <div class="identity-top">
+            <span class="identity-index">PROFILE / 02</span>
+            <span class="identity-index">HoshimiRox1</span>
+          </div>
+          <div class="avatar-box">
+            <img src="/assets/profile/avatar.png" alt="HoshimiRox1 avatar" onerror="this.remove()" />
+            <span>???</span>
+          </div>
+          <div>
+            <h2>Hoshimi<br />Rox1</h2>
+            <p>审美、兴趣、技术栈和正在升级的能力，都贴在这块个人白板上。</p>
+          </div>
+        </section>
+
+        <article class="sticky" data-note="intro">
+          <div class="sticky-label"><span>IDENTITY</span></div>
+          <h2>审美和表达欲先行。</h2>
+          <p>技术还在升级，但目标很清楚：把喜欢的东西做成有强烈个人感的网页。</p>
+        </article>
+
+        <article class="sticky" data-note="stack">
+          <div class="sticky-label"><span>LOADOUT</span></div>
+          <h2>技术栈像装备栏。</h2>
+          <div class="tag-list">
+            <span class="tag">React</span>
+            <span class="tag">CSS</span>
+            <span class="tag">GSAP</span>
+            <span class="tag">Vite</span>
+            <span class="tag">UI Motion</span>
+          </div>
+        </article>
+
+        <article class="sticky" data-note="taste">
+          <div class="sticky-label"><span>TASTE</span></div>
+          <h2>兴趣是燃料。</h2>
+          <div class="tag-list">
+            <span class="tag">Anime</span>
+            <span class="tag">Games</span>
+            <span class="tag">Personal Site</span>
+            <span class="tag">Music</span>
+            <span class="tag">Cool UI</span>
+          </div>
+        </article>
+
+        <article class="sticky" data-note="quest">
+          <div class="sticky-label"><span>CURRENT QUEST</span></div>
+          <h2>把品味变成能跑的界面。</h2>
+          <p>现在的主线任务：更会做视觉、更会做动效、更会把想法落成作品。</p>
+        </article>
+
+        <article class="sticky" data-note="contact">
+          <div class="sticky-label"><span>LINKS</span></div>
+          <h2>GitHub / Blog / Mail</h2>
+          <div class="tag-list">
+            <div class="mini-card">GitHub</div>
+            <div class="mini-card">Blog</div>
+            <div class="mini-card">Mail</div>
+          </div>
+        </article>
+
+        <div class="board-meta">
+          <span class="meta-chip">NOT A RESUME</span>
+          <span class="meta-chip">INTEREST-DRIVEN BUILDER</span>
+          <span class="meta-chip">FRESH BRUTAL PROFILE</span>
+        </div>
+      </section>
+
+      <aside class="side-bands">
+        <div class="band home">HOME</div>
+        <div class="band profile">PROFILE</div>
+        <div class="band portfolio">PORTFOLIO</div>
+        <div class="band blog">BLOG</div>
+      </aside>
+    </main>
+
+    <script>
+      const board = document.getElementById("board");
+      const notes = [...document.querySelectorAll(".sticky")].map((element) => ({
+        element,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        dragging: false,
+        pointerOffsetX: 0,
+        pointerOffsetY: 0,
+      }));
+
+      const renderNote = (note) => {
+        note.element.style.setProperty("--tx", `${note.x}px`);
+        note.element.style.setProperty("--ty", `${note.y}px`);
+      };
+
+      notes.forEach((note) => {
+        note.element.addEventListener("pointerdown", (event) => {
+          note.dragging = true;
+          note.element.setPointerCapture(event.pointerId);
+          const rect = note.element.getBoundingClientRect();
+          note.pointerOffsetX = event.clientX - rect.left;
+          note.pointerOffsetY = event.clientY - rect.top;
+          note.vx = 0;
+          note.vy = 0;
+        });
+
+        note.element.addEventListener("pointermove", (event) => {
+          if (!note.dragging) {
+            return;
+          }
+
+          const boardRect = board.getBoundingClientRect();
+          const baseX = parseFloat(getComputedStyle(note.element).left);
+          const baseY = parseFloat(getComputedStyle(note.element).top);
+          note.x = event.clientX - boardRect.left - note.pointerOffsetX - baseX;
+          note.y = event.clientY - boardRect.top - note.pointerOffsetY - baseY;
+          renderNote(note);
+        });
+
+        note.element.addEventListener("pointerup", (event) => {
+          note.dragging = false;
+          note.element.releasePointerCapture(event.pointerId);
+        });
+      });
+
+      notes.forEach(renderNote);
+    </script>
+  </body>
+</html>
