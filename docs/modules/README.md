@@ -1,6 +1,6 @@
 # Modules README
 
-> 本目录按“通用模块 / 页面专有模块”组织 Roxy Blog 的实现文档。后续开发先读 `docs/DESIGN.md`，再按本索引读取对应模块文档。
+> 本目录按“通用模块 / 页面专有模块”组织 Roxy Blog 的实现文档。后续开发先读 `docs/DESIGN.md`，再按本索引读取对应模块文档；凡是涉及响应式布局，必须先读 `docs/modules/universal/responsive-layout-thresholds.md`。
 
 ## 目录结构
 
@@ -92,3 +92,4 @@ docs/modules/
 - 当前阶段任务：`docs/TODO.md`
 - 产品边界：`docs/brief.md`
 - 技术选型：`docs/Technical-Stack.md`
+- 响应式断点与联动缩放约束：`docs/modules/universal/responsive-layout-thresholds.md`

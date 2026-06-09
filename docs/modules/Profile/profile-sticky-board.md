@@ -28,15 +28,15 @@ Profile 页面由章节封面和 Sticky Board 两段组成。访问 `/profile` �
 - 改身份描述：`src/data/profile.js`
 - 改贴纸文案：`src/data/profile.js`
 - 改链接：`src/data/profile.js`
-- 改头像：替换根路径静态资源 `/assets/Avatar.jpg`
-- 增加 Profile 图片：确认资源实际落点后，在 `src/data/profile.js` 的 `avatarSrc` 或其他字段里引用。
+- 改头像：替换 `public/assets/Avatar.jpg`
+- 增加 Profile 图片：推荐先放入 `public/assets/`，再在 `src/data/profile.js` 的 `avatarSrc` 或其他字段里引用。
 
 ## 组件边界
 
 - `ProfilePage` 只负责封面/白板阶段切换、动画触发和 whiteboard 组件组合。
 - `ProfileIdentityCard` 只负责身份大方块渲染和头像失败 fallback。
 - `ProfileStickyNote` 只负责单张磁贴渲染。
-- `useDraggableNote` 只负责桌面端拖动状态，状态不持久化。
+- `useDraggableNote` 只负责桌面端 pointer 拖动状态，状态不持久化，并避免浏览器原生 drag ghost。
 - `SectionCover` 复用章节封面视觉，供 Profile / Portfolio / Blog 继续扩展。
 
 ## 默认布局数据
@@ -66,10 +66,12 @@ Profile 桌面端磁贴默认位置不再由碰撞算法计算，而是由 `src/
 
 - Profile route 滚动 ownership 已切到 `.app-shell--profile`，不再影响 Home 的全屏舞台滚动模式。
 - Avatar 当前资源路径为 `/assets/Avatar.jpg`，并保留失败 fallback。
+- Avatar 源图来自用户提供的 `dist/assets/Avatar*.jpg`，当前已复制到 `public/assets/Avatar.jpg` 作为稳定运行时资源。
 - Identity card 当前版本已对齐 preview 气质：浅青底、`1:1` 头像框和双行显示名 `Hoshimi / Rox1`。
 - 桌面端磁贴布局已从碰撞算法改为 preview 对齐 preset，避免 1440px 和 1920px 桌面下被压成长条。
 - 身份卡、头像框、标题字号和 footer 偏移已改为同一组桌面响应 token，定义在 `src/utils/profileResponsive.js`。
 - 手机态阈值已从 `760px` 提前到 `830px`，直接吃掉原先 `830px - 760px` 的尴尬错位区间。
+- 磁贴拖动已去掉原生 HTML5 `draggable`，只保留 pointer 拖动，因此不会再出现浏览器生成的拖拽虚影。
 
 ## 已知问题
 
@@ -78,7 +80,7 @@ Profile 桌面端磁贴默认位置不再由碰撞算法计算，而是由 `src/
 ## 响应式行为
 
 - 桌面端使用整块 whiteboard + 全站原有竖条导航。
-- 桌面端磁贴 hover 轻微旋转，鼠标拖动改变内存位移。
+- 桌面端磁贴 hover 轻微旋转，鼠标直接拖动磁贴本体改变内存位移，不使用原生拖影。
 - `831px - 980px` 改为单列 whiteboard 过渡态。
 - `830px` 及以下直接进入移动端：顶部身份卡 + 固定错位贴纸流，关闭拖动和 hover 旋转。
 - `prefers-reduced-motion: reduce` 下取消明显自动位移和 hover 过渡。
