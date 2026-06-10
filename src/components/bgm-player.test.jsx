@@ -44,6 +44,10 @@ function changeRange(element, value) {
   });
 }
 
+async function flushEffects() {
+  await act(async () => {});
+}
+
 describe("BgmPlayer", () => {
   beforeEach(() => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(async function play() {
@@ -62,7 +66,22 @@ describe("BgmPlayer", () => {
     document.body.innerHTML = "";
   });
 
-  it("starts paused and restores track, volume, and progress without autoplay", () => {
+  it("tries autoplay at the default 10 percent volume when no state is stored", async () => {
+    const { container, cleanup } = renderPlayer();
+
+    await flushEffects();
+
+    expect(container.querySelector(".bgm-volume-range")?.value).toBe("0.1");
+    expect(container.querySelector(".bgm-audio")?.volume).toBe(0.1);
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+    expect(container.querySelector(".bgm-play-button")?.getAttribute("aria-label")).toBe(
+      "暂停",
+    );
+
+    cleanup();
+  });
+
+  it("keeps stored track, volume, and progress while trying autoplay", async () => {
     window.localStorage.setItem(
       "roxy-bgm:v1",
       JSON.stringify({ trackId: tracks[1].id, volume: 0.35, currentTime: 42 }),
@@ -70,16 +89,34 @@ describe("BgmPlayer", () => {
 
     const { container, cleanup } = renderPlayer();
 
+    await flushEffects();
+
     expect(container.querySelector(".bgm-player-title")?.textContent).toBe(
       tracks[1].title,
     );
     expect(container.querySelector(".bgm-play-button")?.getAttribute("aria-label")).toBe(
-      "播放",
+      "暂停",
     );
-    expect(container.querySelector(".bgm-play-button svg")?.dataset.icon).toBe("play");
+    expect(container.querySelector(".bgm-play-button svg")?.dataset.icon).toBe("pause");
     expect(container.querySelector(".bgm-volume-range")?.value).toBe("0.35");
     expect(container.querySelector(".bgm-audio")?.currentTime).toBe(42);
-    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+
+    cleanup();
+  });
+
+  it("reports a rejected autoplay request without marking playback active", async () => {
+    HTMLMediaElement.prototype.play.mockRejectedValueOnce(
+      new DOMException("blocked", "NotAllowedError"),
+    );
+
+    const { container, cleanup } = renderPlayer();
+    await flushEffects();
+
+    expect(container.querySelector(".bgm-play-button")?.getAttribute("aria-label")).toBe(
+      "播放",
+    );
+    expect(container.querySelector(".bgm-player-status")?.textContent).toBe("tap play");
 
     cleanup();
   });
@@ -88,6 +125,11 @@ describe("BgmPlayer", () => {
     const { container, cleanup } = renderPlayer();
     const audio = container.querySelector(".bgm-audio");
     const playButton = container.querySelector(".bgm-play-button");
+
+    await flushEffects();
+
+    click(playButton);
+    expect(playButton.getAttribute("aria-label")).toBe("播放");
 
     await act(async () => click(playButton));
     expect(playButton.getAttribute("aria-label")).toBe("暂停");
@@ -227,6 +269,12 @@ describe("BgmPlayer", () => {
         "--bgm-progress",
       ),
     ).toBe("35.55555555555556%");
+    expect(
+      container.querySelector(".bgm-volume-panel")?.style.getPropertyValue(
+        "--bgm-volume",
+      ),
+    ).toBe("40%");
+    expect(container.querySelector(".bgm-volume-value")?.textContent).toBe("40%");
     expect(JSON.parse(window.localStorage.getItem("roxy-bgm:v1"))).toMatchObject({
       trackId: tracks[0].id,
       currentTime: 64,
@@ -305,6 +353,24 @@ describe("BgmPlayer", () => {
     expect(container.querySelector(".bgm-player")?.className).toContain(
       "bgm-player--expanded",
     );
+
+    cleanup();
+  });
+
+  it("keeps the base visually connected until the closing timeline completes", () => {
+    window.matchMedia.mockReturnValueOnce({
+      matches: false,
+      addEventListener() {},
+      removeEventListener() {},
+    });
+    const { container, cleanup } = renderPlayer();
+    const player = container.querySelector(".bgm-player");
+    const surface = container.querySelector(".bgm-toggle-surface");
+
+    click(surface);
+    expect(player.className).toContain("bgm-player--drawer-connected");
+    container.querySelector(".bgm-drawer").dispatchEvent(new Event("irrelevant"));
+    player.className = player.className;
 
     cleanup();
   });

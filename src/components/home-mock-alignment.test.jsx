@@ -1,6 +1,6 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { characters } from "../data/site";
 import { tracks } from "../data/bgm";
 import BgmPlayer from "./BgmPlayer";
@@ -15,7 +15,12 @@ window.matchMedia = window.matchMedia ?? (() => ({
   removeEventListener() {},
 }));
 
+beforeEach(() => {
+  vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
+});
+
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
 });
 

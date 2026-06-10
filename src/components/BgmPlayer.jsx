@@ -7,6 +7,8 @@ import { formatBgmTime, useBgmPlayer } from "./useBgmPlayer";
 
 gsap.registerPlugin(useGSAP);
 
+const EXPANSION_LOCK_TIMEOUT_MS = 950;
+
 // 阻止播放器控件点击冒泡到卡片展开层。
 function stopControlEvent(event) {
   event.stopPropagation();
@@ -66,9 +68,11 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
   const rootRef = useRef(null);
   const timelineRef = useRef(null);
   const volumeTimelineRef = useRef(null);
-  const expansionLockRef = useRef(false);
+  const expansionLockedUntilRef = useRef(0);
   const volumeLockRef = useRef(false);
+  const expandedStateRef = useRef(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDrawerConnected, setIsDrawerConnected] = useState(false);
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
   const [coverFailed, setCoverFailed] = useState(false);
   const player = useBgmPlayer(trackList);
@@ -84,13 +88,10 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
         .timeline({
           paused: true,
           defaults: { ease: "power2.inOut" },
-          onComplete: () => {
-            expansionLockRef.current = false;
-          },
           onReverseComplete: () => {
             gsap.set(".bgm-drawer-viewport", { visibility: "hidden" });
             gsap.set(".bgm-drawer", { yPercent: 100 });
-            expansionLockRef.current = false;
+            setIsDrawerConnected(false);
           },
         })
         .to(".bgm-collapsed-copy", { autoAlpha: 0, x: 28, duration: 0.16 })
@@ -121,7 +122,7 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
             volumeLockRef.current = false;
           },
         })
-        .to(".bgm-cover-wrap", { x: -30, duration: 0.18 })
+        .to(".bgm-cover-wrap", { x: -37, duration: 0.18 })
         .to(
           ".bgm-volume-panel",
           { clipPath: "inset(0% 0 0 0)", duration: 0.2 },
@@ -136,22 +137,35 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
     setCoverFailed(false);
   }, [player.currentTrack.cover]);
 
+  // 保持同步展开态，避免连续点击读到 React 批处理前的旧闭包。
+  useEffect(() => {
+    expandedStateRef.current = isExpanded;
+  }, [isExpanded]);
+
   // 按严格时间线展开或反向收起播放器。
   function toggleExpanded() {
     const timeline = timelineRef.current;
-    if (expansionLockRef.current) return;
+    if (Date.now() < expansionLockedUntilRef.current) return;
+    const currentExpanded = expandedStateRef.current;
 
-    if (isExpanded && isVolumeOpen) {
+    if (currentExpanded && isVolumeOpen) {
       volumeTimelineRef.current?.progress(0).pause();
       setIsVolumeOpen(false);
+      volumeLockRef.current = false;
     }
 
-    const nextExpanded = !isExpanded;
+    const nextExpanded = !currentExpanded;
+    expandedStateRef.current = nextExpanded;
+    if (nextExpanded) {
+      setIsDrawerConnected(true);
+    }
     setIsExpanded(nextExpanded);
     if (!reducedMotion) {
-      expansionLockRef.current = true;
+      expansionLockedUntilRef.current = Date.now() + EXPANSION_LOCK_TIMEOUT_MS;
       if (nextExpanded) timeline?.play();
       else timeline?.reverse();
+    } else if (!nextExpanded) {
+      setIsDrawerConnected(false);
     }
   }
 
@@ -172,13 +186,17 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
   const progressPercent = player.duration
     ? `${(player.currentTime / player.duration) * 100}%`
     : "0%";
+  const volumePercent = `${player.volume * 100}%`;
+  const volumeLabel = `${Math.round(player.volume * 100)}%`;
 
   return (
     <aside
       ref={rootRef}
       className={`bgm-player ${isHome ? "bgm-player--home" : ""} ${
         isExpanded ? "bgm-player--expanded" : ""
-      } ${isVolumeOpen ? "bgm-player--volume-open" : ""}`}
+      } ${isDrawerConnected ? "bgm-player--drawer-connected" : ""} ${
+        isVolumeOpen ? "bgm-player--volume-open" : ""
+      }`}
     >
       <audio
         ref={player.audioRef}
@@ -199,13 +217,14 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
             </div>
             <div
               className="bgm-volume-panel"
+              style={{ "--bgm-volume": volumePercent }}
               aria-hidden={!isVolumeOpen}
               inert={!isVolumeOpen}
             >
-              <span
-                className="bgm-volume-fill"
-                style={{ height: `${player.volume * 100}%` }}
-              />
+              <span className="bgm-volume-visual" aria-hidden="true">
+                <span className="bgm-volume-visual-fill" />
+                <span className="bgm-volume-visual-thumb" />
+              </span>
               <input
                 className="bgm-volume-range"
                 type="range"
@@ -217,6 +236,9 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
                 onClick={stopControlEvent}
                 onChange={(event) => player.setVolume(Number(event.target.value))}
               />
+              <span className="bgm-volume-value" aria-hidden="true">
+                {volumeLabel}
+              </span>
             </div>
             <div className="bgm-cover-wrap">
               {player.currentTrack.cover && !coverFailed ? (
@@ -266,13 +288,16 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
         </section>
       </div>
 
-      <section className="bgm-base">
+      <section className="bgm-base" onClick={toggleExpanded}>
         <button
           className="bgm-toggle-surface"
           type="button"
           aria-label={isExpanded ? "收起歌曲详情" : "展开歌曲详情"}
           aria-expanded={isExpanded}
-          onClick={toggleExpanded}
+          onClick={(event) => {
+            stopControlEvent(event);
+            toggleExpanded();
+          }}
         />
         <button
           className="bgm-track-button bgm-previous-button"

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_KEY = "roxy-bgm:v1";
-const DEFAULT_VOLUME = 0.72;
+const DEFAULT_VOLUME = 0.1;
 
 // 将数值限制在播放器允许的范围内。
 function clamp(value, minimum, maximum) {
@@ -44,6 +44,7 @@ export function formatBgmTime(seconds) {
 export function useBgmPlayer(trackList) {
   const initialState = useMemo(() => readStoredState(trackList), [trackList]);
   const audioRef = useRef(null);
+  const autoplayAttemptedRef = useRef(false);
   const pendingPlayRef = useRef(false);
   const restoredTimeRef = useRef(initialState.currentTime);
   const [trackIndex, setTrackIndex] = useState(initialState.trackIndex);
@@ -130,6 +131,12 @@ export function useBgmPlayer(trackList) {
 
     if (pendingPlayRef.current) {
       pendingPlayRef.current = false;
+      void play();
+      return;
+    }
+
+    if (!autoplayAttemptedRef.current) {
+      autoplayAttemptedRef.current = true;
       void play();
     }
   }, [currentTrack]);
