@@ -36,7 +36,7 @@ docs/modules/
 | 桌面侧栏色带导航与页面转场 | `docs/modules/universal/navigation-page-transition.md` | 已实现，冻结 |
 | 响应式导航与移动端 Menu | `docs/modules/universal/responsive-navigation.md` | 已实现，冻结 |
 | 响应式分段与联动缩放原则 | `docs/modules/universal/responsive-layout-thresholds.md` | 已沉淀，供后续页面复用 |
-| BGM 播放器 | `docs/modules/universal/bgm-player.md` | Phase 1 已实现，待接真实音频 |
+| BGM 播放器 | `docs/modules/universal/bgm-player.md` | 多曲目功能已实现，待补正式素材与移动端复验 |
 
 ## 页面专有模块
 

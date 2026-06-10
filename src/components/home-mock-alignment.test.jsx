@@ -2,6 +2,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { characters } from "../data/site";
+import { tracks } from "../data/bgm";
 import BgmPlayer from "./BgmPlayer";
 import CharacterStage from "./CharacterStage";
 import HomePage from "./HomePage";
@@ -298,12 +299,16 @@ describe("Home mock alignment", () => {
     cleanup();
   });
 
-  it("uses the mock-style BGM status copy", () => {
+  it("uses the current track title and user-triggered status copy", () => {
+    const loadSpy = vi
+      .spyOn(HTMLMediaElement.prototype, "load")
+      .mockImplementation(() => {});
     const { container, cleanup } = render(<BgmPlayer isHome />);
 
-    expect(container.textContent).toContain("BGM");
+    expect(container.textContent).toContain(tracks[0].title);
     expect(container.textContent).toContain("user triggered");
 
     cleanup();
+    loadSpy.mockRestore();
   });
 });
