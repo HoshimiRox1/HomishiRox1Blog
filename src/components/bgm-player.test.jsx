@@ -73,7 +73,10 @@ describe("BgmPlayer", () => {
     expect(container.querySelector(".bgm-player-title")?.textContent).toBe(
       tracks[1].title,
     );
-    expect(container.querySelector(".bgm-play-button")?.textContent).toBe("PLAY");
+    expect(container.querySelector(".bgm-play-button")?.getAttribute("aria-label")).toBe(
+      "播放",
+    );
+    expect(container.querySelector(".bgm-play-button svg")?.dataset.icon).toBe("play");
     expect(container.querySelector(".bgm-volume-range")?.value).toBe("0.35");
     expect(container.querySelector(".bgm-audio")?.currentTime).toBe(42);
     expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
@@ -87,16 +90,18 @@ describe("BgmPlayer", () => {
     const playButton = container.querySelector(".bgm-play-button");
 
     await act(async () => click(playButton));
-    expect(playButton.textContent).toBe("PAUSE");
+    expect(playButton.getAttribute("aria-label")).toBe("暂停");
+    expect(playButton.querySelector("svg")?.dataset.icon).toBe("pause");
 
     click(playButton);
-    expect(playButton.textContent).toBe("PLAY");
+    expect(playButton.getAttribute("aria-label")).toBe("播放");
+    expect(playButton.querySelector("svg")?.dataset.icon).toBe("play");
 
     HTMLMediaElement.prototype.play.mockRejectedValueOnce(
       new DOMException("blocked", "NotAllowedError"),
     );
     await act(async () => click(playButton));
-    expect(playButton.textContent).toBe("PLAY");
+    expect(playButton.getAttribute("aria-label")).toBe("播放");
     expect(container.querySelector(".bgm-player-status")?.textContent).toBe("tap play");
 
     cleanup();
@@ -146,6 +151,47 @@ describe("BgmPlayer", () => {
     cleanup();
   });
 
+  it("renders accessible SVG icons for every transport control", () => {
+    const { container, cleanup } = renderPlayer();
+
+    expect(container.querySelector('.bgm-previous-button svg')?.dataset.icon).toBe(
+      "previous",
+    );
+    expect(container.querySelector('.bgm-next-button svg')?.dataset.icon).toBe("next");
+    expect(container.querySelector('.bgm-volume-button svg')?.dataset.icon).toBe(
+      "volume",
+    );
+    expect(container.querySelector('.bgm-previous-button')?.getAttribute('aria-label')).toBe(
+      "上一首",
+    );
+    expect(container.querySelector('.bgm-next-button')?.getAttribute('aria-label')).toBe(
+      "下一首",
+    );
+
+    cleanup();
+  });
+
+  it("keeps the detail drawer inside a clipping viewport behind the base card", () => {
+    const { container, cleanup } = renderPlayer();
+    const viewport = container.querySelector(".bgm-drawer-viewport");
+    const drawer = container.querySelector(".bgm-drawer");
+
+    expect(viewport).not.toBeNull();
+    expect(viewport?.contains(drawer)).toBe(true);
+    expect(container.querySelector(".bgm-base")?.previousElementSibling).toBe(viewport);
+
+    cleanup();
+  });
+
+  it("places the hard cover slot after the detail copy and volume controls", () => {
+    const { container, cleanup } = renderPlayer();
+    const heading = container.querySelector(".bgm-drawer-heading");
+
+    expect(heading?.lastElementChild?.classList.contains("bgm-cover-wrap")).toBe(true);
+
+    cleanup();
+  });
+
   it("hides a missing artist and exposes accessible range controls", () => {
     const customTracks = [
       { ...tracks[0], artist: undefined },
@@ -176,6 +222,11 @@ describe("BgmPlayer", () => {
 
     expect(audio.currentTime).toBe(64);
     expect(audio.volume).toBe(0.4);
+    expect(
+      container.querySelector(".bgm-progress-range")?.style.getPropertyValue(
+        "--bgm-progress",
+      ),
+    ).toBe("35.55555555555556%");
     expect(JSON.parse(window.localStorage.getItem("roxy-bgm:v1"))).toMatchObject({
       trackId: tracks[0].id,
       currentTime: 64,
@@ -200,7 +251,11 @@ describe("BgmPlayer", () => {
   });
 
   it("restores the cover element after a failed cover and a track change", () => {
-    const { container, cleanup } = renderPlayer();
+    const coverTracks = tracks.map((track, index) => ({
+      ...track,
+      cover: `/cover-${index + 1}.webp`,
+    }));
+    const { container, cleanup } = renderPlayer({ trackList: coverTracks });
     const firstCover = container.querySelector(".bgm-cover-wrap img");
 
     act(() => firstCover.dispatchEvent(new Event("error")));
@@ -208,14 +263,18 @@ describe("BgmPlayer", () => {
 
     click(container.querySelector(".bgm-next-button"));
     expect(container.querySelector(".bgm-cover-wrap img")?.getAttribute("src")).toBe(
-      tracks[1].cover,
+      coverTracks[1].cover,
     );
 
     cleanup();
   });
 
   it("restores the cover element when an ended track advances automatically", async () => {
-    const { container, cleanup } = renderPlayer();
+    const coverTracks = tracks.map((track, index) => ({
+      ...track,
+      cover: `/cover-${index + 1}.webp`,
+    }));
+    const { container, cleanup } = renderPlayer({ trackList: coverTracks });
     act(() =>
       container.querySelector(".bgm-cover-wrap img").dispatchEvent(new Event("error")),
     );
@@ -225,7 +284,7 @@ describe("BgmPlayer", () => {
     );
 
     expect(container.querySelector(".bgm-cover-wrap img")?.getAttribute("src")).toBe(
-      tracks[1].cover,
+      coverTracks[1].cover,
     );
 
     cleanup();

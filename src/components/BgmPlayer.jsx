@@ -12,6 +12,55 @@ function stopControlEvent(event) {
   event.stopPropagation();
 }
 
+// 渲染无外部依赖的播放器控制图标。
+function PlayerIcon({ name }) {
+  const commonProps = {
+    "aria-hidden": "true",
+    "data-icon": name,
+    focusable: "false",
+    viewBox: "0 0 24 24",
+  };
+
+  if (name === "pause") {
+    return (
+      <svg {...commonProps}>
+        <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+      </svg>
+    );
+  }
+
+  if (name === "previous") {
+    return (
+      <svg {...commonProps}>
+        <path d="M6 5h3v14H6zM18 5v14L9 12z" />
+      </svg>
+    );
+  }
+
+  if (name === "next") {
+    return (
+      <svg {...commonProps}>
+        <path d="M15 5h3v14h-3zM6 5v14l9-7z" />
+      </svg>
+    );
+  }
+
+  if (name === "volume") {
+    return (
+      <svg {...commonProps}>
+        <path d="M4 9v6h4l5 4V5L8 9H4z" />
+        <path d="M16 8.2a5 5 0 0 1 0 7.6M18.5 5.8a8.5 8.5 0 0 1 0 12.4" fill="none" stroke="currentColor" strokeWidth="2" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...commonProps}>
+      <path d="M7 5v14l11-7z" />
+    </svg>
+  );
+}
+
 // 渲染固定左下角的多曲目播放器。
 export default function BgmPlayer({ isHome = false, trackList = tracks }) {
   const rootRef = useRef(null);
@@ -29,6 +78,8 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
     () => {
       if (reducedMotion) return;
 
+      gsap.set(".bgm-drawer", { yPercent: 100 });
+
       timelineRef.current = gsap
         .timeline({
           paused: true,
@@ -37,6 +88,8 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
             expansionLockRef.current = false;
           },
           onReverseComplete: () => {
+            gsap.set(".bgm-drawer-viewport", { visibility: "hidden" });
+            gsap.set(".bgm-drawer", { yPercent: 100 });
             expansionLockRef.current = false;
           },
         })
@@ -54,8 +107,8 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
           { autoAlpha: 1, x: 62, duration: 0.18 },
           "<0.04",
         )
-        .set(".bgm-drawer", { visibility: "visible" })
-        .to(".bgm-drawer", { y: 0, duration: 0.28 }, ">-0.02");
+        .set(".bgm-drawer-viewport", { visibility: "visible" })
+        .to(".bgm-drawer", { yPercent: 0, duration: 0.32 }, ">-0.02");
 
       volumeTimelineRef.current = gsap
         .timeline({
@@ -68,7 +121,7 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
             volumeLockRef.current = false;
           },
         })
-        .to(".bgm-cover-wrap", { x: -10, duration: 0.18 })
+        .to(".bgm-cover-wrap", { x: -30, duration: 0.18 })
         .to(
           ".bgm-volume-panel",
           { clipPath: "inset(0% 0 0 0)", duration: 0.2 },
@@ -116,6 +169,9 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
   }
 
   const durationLabel = player.duration > 0 ? formatBgmTime(player.duration) : "--:--";
+  const progressPercent = player.duration
+    ? `${(player.currentTime / player.duration) * 100}%`
+    : "0%";
 
   return (
     <aside
@@ -134,86 +190,81 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
         onError={player.handleError}
       />
 
-      <section className="bgm-drawer" aria-hidden={!isExpanded} inert={!isExpanded}>
-        <div className="bgm-drawer-heading">
-          <div className="bgm-drawer-copy" aria-live="polite">
-            <strong>{player.currentTrack.title}</strong>
-            {player.currentTrack.artist ? <span>{player.currentTrack.artist}</span> : null}
-          </div>
-          <div className="bgm-cover-wrap">
-            {!coverFailed ? (
-              <img
-                src={player.currentTrack.cover}
-                alt=""
-                onLoad={() => setCoverFailed(false)}
-                onError={() => setCoverFailed(true)}
+      <div className="bgm-drawer-viewport">
+        <section className="bgm-drawer" aria-hidden={!isExpanded} inert={!isExpanded}>
+          <div className="bgm-drawer-heading">
+            <div className="bgm-drawer-copy" aria-live="polite">
+              <strong>{player.currentTrack.title}</strong>
+              {player.currentTrack.artist ? <span>{player.currentTrack.artist}</span> : null}
+            </div>
+            <div
+              className="bgm-volume-panel"
+              aria-hidden={!isVolumeOpen}
+              inert={!isVolumeOpen}
+            >
+              <span
+                className="bgm-volume-fill"
+                style={{ height: `${player.volume * 100}%` }}
               />
-            ) : (
-              <span>NO ART</span>
-            )}
+              <input
+                className="bgm-volume-range"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={player.volume}
+                aria-label="音量"
+                onClick={stopControlEvent}
+                onChange={(event) => player.setVolume(Number(event.target.value))}
+              />
+            </div>
+            <div className="bgm-cover-wrap">
+              {player.currentTrack.cover && !coverFailed ? (
+                <img
+                  src={player.currentTrack.cover}
+                  alt=""
+                  onLoad={() => setCoverFailed(false)}
+                  onError={() => setCoverFailed(true)}
+                />
+              ) : (
+                <span>NO ART</span>
+              )}
+            </div>
           </div>
-          <div
-            className="bgm-volume-panel"
-            aria-hidden={!isVolumeOpen}
-            inert={!isVolumeOpen}
-          >
-            <span
-              className="bgm-volume-fill"
-              style={{ height: `${player.volume * 100}%` }}
-            />
-            <input
-              className="bgm-volume-range"
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={player.volume}
-              aria-label="音量"
-              onClick={stopControlEvent}
-              onChange={(event) => player.setVolume(Number(event.target.value))}
-            />
-          </div>
-        </div>
 
-        <div className="bgm-progress-row">
-          <span>{formatBgmTime(player.currentTime)}</span>
-          <label className="bgm-progress-control">
-            <span
-              className="bgm-progress-fill"
-              style={{
-                width: player.duration
-                  ? `${(player.currentTime / player.duration) * 100}%`
-                  : "0%",
+          <div className="bgm-progress-row">
+            <span>{formatBgmTime(player.currentTime)}</span>
+            <label className="bgm-progress-control">
+              <input
+                className="bgm-progress-range"
+                type="range"
+                min="0"
+                max={player.duration || 0}
+                step="0.1"
+                value={Math.min(player.currentTime, player.duration || 0)}
+                style={{ "--bgm-progress": progressPercent }}
+                disabled={!player.duration}
+                aria-label="歌曲进度"
+                onClick={stopControlEvent}
+                onChange={(event) => player.seek(Number(event.target.value))}
+              />
+            </label>
+            <span>{durationLabel}</span>
+            <button
+              className="bgm-volume-button"
+              type="button"
+              aria-label={isVolumeOpen ? "收起音量控制" : "展开音量控制"}
+              aria-expanded={isVolumeOpen}
+              onClick={(event) => {
+                stopControlEvent(event);
+                toggleVolume();
               }}
-            />
-            <input
-              className="bgm-progress-range"
-              type="range"
-              min="0"
-              max={player.duration || 0}
-              step="0.1"
-              value={Math.min(player.currentTime, player.duration || 0)}
-              disabled={!player.duration}
-              aria-label="歌曲进度"
-              onClick={stopControlEvent}
-              onChange={(event) => player.seek(Number(event.target.value))}
-            />
-          </label>
-          <span>{durationLabel}</span>
-          <button
-            className="bgm-volume-button"
-            type="button"
-            aria-label={isVolumeOpen ? "收起音量控制" : "展开音量控制"}
-            aria-expanded={isVolumeOpen}
-            onClick={(event) => {
-              stopControlEvent(event);
-              toggleVolume();
-            }}
-          >
-            VOL
-          </button>
-        </div>
-      </section>
+            >
+              <PlayerIcon name="volume" />
+            </button>
+          </div>
+        </section>
+      </div>
 
       <section className="bgm-base">
         <button
@@ -233,17 +284,18 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
             player.previous();
           }}
         >
-          PREV
+          <PlayerIcon name="previous" />
         </button>
         <button
           className="bgm-play-button"
           type="button"
+          aria-label={player.isPlaying ? "暂停" : "播放"}
           onClick={(event) => {
             stopControlEvent(event);
             void player.togglePlay();
           }}
         >
-          {player.isPlaying ? "PAUSE" : "PLAY"}
+          <PlayerIcon name={player.isPlaying ? "pause" : "play"} />
         </button>
         <button
           className="bgm-track-button bgm-next-button"
@@ -255,7 +307,7 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
             player.next();
           }}
         >
-          NEXT
+          <PlayerIcon name="next" />
         </button>
         <div className="bgm-collapsed-copy" aria-live="polite">
           <strong className="bgm-player-title">{player.currentTrack.title}</strong>

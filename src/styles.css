@@ -485,8 +485,7 @@ button {
   display: none;
 }
 
-.bgm-base,
-.bgm-drawer {
+.bgm-base {
   background: var(--shell-paper);
   border: 4px solid var(--ink);
   border-radius: 18px;
@@ -500,21 +499,42 @@ button {
   bottom: 0;
   height: 60px;
   overflow: hidden;
+  transition: border-radius 0.18s ease;
+  z-index: 3;
+}
+
+.bgm-drawer-viewport {
+  bottom: 52px;
+  height: 112px;
+  left: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  visibility: hidden;
+  width: calc(100% + 7px);
   z-index: 2;
 }
 
 .bgm-drawer {
-  bottom: 52px;
+  background: var(--shell-paper);
+  border: 4px solid var(--ink);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  bottom: 0;
   height: 108px;
+  left: 0;
   padding: 10px 10px 8px;
-  pointer-events: none;
-  transform: translateY(86%);
-  visibility: hidden;
-  z-index: 1;
+  position: absolute;
+  box-shadow: 7px 0 0 var(--ink);
+  width: calc(100% - 7px);
 }
 
-.bgm-player--expanded .bgm-drawer {
+.bgm-player--expanded .bgm-drawer-viewport {
   pointer-events: auto;
+}
+
+.bgm-player--expanded .bgm-base {
+  border-radius: 0 0 18px 18px;
 }
 
 .bgm-toggle-surface {
@@ -547,16 +567,27 @@ button {
   z-index: 3;
 }
 
+.bgm-play-button svg,
+.bgm-track-button svg,
+.bgm-volume-button svg {
+  display: block;
+  fill: currentColor;
+  height: 18px;
+  pointer-events: none;
+  width: 18px;
+}
+
 .bgm-play-button {
-  font-size: 0.78rem;
   left: 10px;
-  min-width: 58px;
+  min-width: 44px;
+  padding: 0;
 }
 
 .bgm-track-button {
   background: var(--home-color);
   left: 81px;
-  min-width: 52px;
+  min-width: 44px;
+  padding: 0;
   opacity: 0;
   visibility: hidden;
 }
@@ -564,7 +595,7 @@ button {
 .bgm-collapsed-copy {
   display: grid;
   gap: 1px;
-  left: 78px;
+  left: 64px;
   line-height: 1.08;
   max-width: 126px;
   pointer-events: none;
@@ -592,10 +623,10 @@ button {
 }
 
 .bgm-drawer-heading {
-  align-items: start;
+  align-items: center;
   display: grid;
   gap: 8px;
-  grid-template-columns: minmax(0, 1fr) 42px 28px;
+  grid-template-columns: minmax(0, 1fr) 44px;
   min-height: 48px;
   position: relative;
 }
@@ -605,6 +636,10 @@ button {
   gap: 2px;
   min-width: 0;
   padding-top: 2px;
+}
+
+.bgm-player--volume-open .bgm-drawer-copy {
+  max-width: calc(100% - 30px);
 }
 
 .bgm-drawer-copy strong {
@@ -629,12 +664,12 @@ button {
   align-items: center;
   background: var(--home-color);
   border: 3px solid var(--ink);
-  border-radius: 9px;
+  border-radius: 0;
   display: flex;
-  height: 42px;
+  height: 44px;
   justify-content: center;
   overflow: hidden;
-  width: 42px;
+  width: 44px;
 }
 
 .bgm-cover-wrap img {
@@ -649,37 +684,46 @@ button {
 }
 
 .bgm-volume-panel {
-  align-self: start;
-  background: var(--shell-paper);
-  border: 3px solid var(--ink);
-  border-radius: 999px;
+  bottom: -8px;
   clip-path: inset(100% 0 0 0);
   height: 52px;
-  margin-left: 6px;
   overflow: visible;
-  position: relative;
-  width: 12px;
+  position: absolute;
+  right: 14px;
+  width: 18px;
+}
+
+.bgm-volume-panel::before {
+  background: var(--ink);
+  bottom: 0;
+  content: "";
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 3px;
 }
 
 .bgm-volume-fill {
   background: var(--action-accent);
-  border-radius: 999px;
   bottom: 0;
-  left: 0;
+  left: 50%;
   pointer-events: none;
   position: absolute;
-  width: 100%;
+  transform: translateX(-50%);
+  width: 3px;
+  z-index: 1;
 }
 
 .bgm-volume-range {
   appearance: none;
   background: transparent;
   height: 52px;
-  inset: -3px;
+  inset: 0;
   margin: 0;
   position: absolute;
   touch-action: none;
-  transform: rotate(-90deg) translateX(-40px);
+  transform: rotate(-90deg) translateX(-34px);
   transform-origin: left top;
   width: 52px;
 }
@@ -696,7 +740,7 @@ button {
 
 .bgm-volume-range::-webkit-slider-thumb {
   appearance: none;
-  background: var(--shell-paper);
+  background: var(--action-accent);
   border: 3px solid var(--ink);
   border-radius: 50%;
   height: 13px;
@@ -704,7 +748,7 @@ button {
 }
 
 .bgm-volume-range::-moz-range-thumb {
-  background: var(--shell-paper);
+  background: var(--action-accent);
   border: 3px solid var(--ink);
   border-radius: 50%;
   height: 9px;
@@ -725,57 +769,55 @@ button {
 }
 
 .bgm-progress-control {
-  background: var(--shell-paper);
-  border: 2px solid var(--ink);
-  border-radius: 999px;
   display: block;
-  height: 9px;
+  height: 3px;
   overflow: visible;
   position: relative;
-}
-
-.bgm-progress-fill {
-  background: var(--action-accent);
-  border-radius: 999px;
-  bottom: 0;
-  left: 0;
-  pointer-events: none;
-  position: absolute;
-  top: 0;
 }
 
 .bgm-progress-range {
   appearance: none;
   background: transparent;
   height: 20px;
-  left: -2px;
+  left: 0;
   margin: 0;
   position: absolute;
-  top: -7px;
-  width: calc(100% + 4px);
+  top: -9px;
+  width: 100%;
 }
 
 .bgm-progress-range::-webkit-slider-runnable-track {
-  background: transparent;
+  background: linear-gradient(
+    to right,
+    var(--action-accent) 0 var(--bgm-progress),
+    var(--ink) var(--bgm-progress) 100%
+  );
   border: 0;
+  height: 3px;
 }
 
 .bgm-progress-range::-moz-range-track {
-  background: transparent;
+  background: linear-gradient(
+    to right,
+    var(--action-accent) 0 var(--bgm-progress),
+    var(--ink) var(--bgm-progress) 100%
+  );
   border: 0;
+  height: 3px;
 }
 
 .bgm-progress-range::-webkit-slider-thumb {
   appearance: none;
-  background: var(--shell-paper);
+  background: var(--action-accent);
   border: 2px solid var(--ink);
   border-radius: 50%;
   height: 11px;
+  margin-top: -4px;
   width: 11px;
 }
 
 .bgm-progress-range::-moz-range-thumb {
-  background: var(--shell-paper);
+  background: var(--action-accent);
   border: 2px solid var(--ink);
   border-radius: 50%;
   height: 8px;
@@ -784,11 +826,16 @@ button {
 
 .bgm-volume-button {
   background: var(--shell-paper);
-  font-size: 0.48rem;
+  border-radius: 8px;
   height: 28px;
-  min-width: 32px;
+  min-width: 34px;
   padding: 0;
   position: static;
+}
+
+.bgm-volume-button svg {
+  height: 15px;
+  width: 15px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -817,13 +864,16 @@ button {
     visibility: visible;
   }
 
-  .bgm-player--expanded .bgm-drawer {
-    transform: translateY(0);
+  .bgm-player--expanded .bgm-drawer-viewport {
     visibility: visible;
   }
 
+  .bgm-player--expanded .bgm-drawer {
+    transform: translateY(0);
+  }
+
   .bgm-player--volume-open .bgm-cover-wrap {
-    transform: translateX(-10px);
+    transform: translateX(-30px);
   }
 
   .bgm-player--volume-open .bgm-volume-panel {
@@ -1502,8 +1552,7 @@ button {
     transform: translateY(-90px);
   }
 
-  .bgm-base,
-  .bgm-drawer {
+  .bgm-base {
     border-width: 3px;
     border-radius: 16px;
     box-shadow: 5px 5px 0 var(--ink);
@@ -1513,9 +1562,23 @@ button {
     height: 56px;
   }
 
-  .bgm-drawer {
+  .bgm-player--expanded .bgm-base {
+    border-radius: 0 0 16px 16px;
+  }
+
+  .bgm-drawer-viewport {
     bottom: 49px;
+    height: 110px;
+    width: calc(100% + 5px);
+  }
+
+  .bgm-drawer {
+    border-width: 3px;
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 5px 0 0 var(--ink);
     height: 106px;
+    width: calc(100% - 5px);
   }
 
   .bgm-play-button,
@@ -1527,17 +1590,17 @@ button {
 
   .bgm-play-button {
     left: 8px;
-    min-width: 54px;
+    min-width: 42px;
   }
 
   .bgm-track-button {
     left: 76px;
-    min-width: 50px;
+    min-width: 42px;
   }
 
   .bgm-collapsed-copy {
-    left: 70px;
-    max-width: 122px;
+    left: 60px;
+    max-width: 132px;
     top: 9px;
   }
 
