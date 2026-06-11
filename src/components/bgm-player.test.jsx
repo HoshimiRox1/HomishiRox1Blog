@@ -116,7 +116,7 @@ describe("BgmPlayer", () => {
     expect(container.querySelector(".bgm-play-button")?.getAttribute("aria-label")).toBe(
       "播放",
     );
-    expect(container.querySelector(".bgm-player-status")?.textContent).toBe("tap play");
+    expect(container.querySelector(".bgm-player-status")).toBeNull();
 
     cleanup();
   });
@@ -144,7 +144,7 @@ describe("BgmPlayer", () => {
     );
     await act(async () => click(playButton));
     expect(playButton.getAttribute("aria-label")).toBe("播放");
-    expect(container.querySelector(".bgm-player-status")?.textContent).toBe("tap play");
+    expect(container.querySelector(".bgm-player-status")).toBeNull();
 
     cleanup();
   });

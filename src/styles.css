@@ -457,6 +457,9 @@ button {
 }
 
 .bgm-player {
+  --bgm-next-left: 162px;
+  --bgm-play-expanded-left: 84px;
+  --bgm-previous-left: 6px;
   bottom: 24px;
   color: var(--ink);
   left: clamp(24px, 3vw, 42px);
@@ -586,7 +589,7 @@ button {
 .bgm-track-button {
   background: var(--home-color);
   border-width: 2px;
-  left: 81px;
+  left: var(--bgm-play-expanded-left);
   min-width: 44px;
   padding: 0;
   opacity: 0;
@@ -865,8 +868,8 @@ button {
   background: var(--shell-paper);
   border-width: 2px;
   border-radius: 8px;
-  height: 28px;
-  min-width: 34px;
+  height: 22px;
+  min-width: 30px;
   padding: 0;
   position: static;
 }
@@ -887,18 +890,18 @@ button {
   }
 
   .bgm-player--expanded .bgm-play-button {
-    transform: translateX(70px);
+    left: var(--bgm-play-expanded-left);
   }
 
   .bgm-player--expanded .bgm-previous-button {
+    left: var(--bgm-previous-left);
     opacity: 1;
-    transform: translateX(-62px);
     visibility: visible;
   }
 
   .bgm-player--expanded .bgm-next-button {
+    left: var(--bgm-next-left);
     opacity: 1;
-    transform: translateX(62px);
     visibility: visible;
   }
 
@@ -1576,10 +1579,13 @@ button {
   }
 
   .bgm-player {
+    --bgm-next-left: 126px;
+    --bgm-play-expanded-left: 65px;
+    --bgm-previous-left: 4px;
     bottom: calc(var(--mobile-menu-height) + 8px);
     left: var(--mobile-hud-left);
     height: 56px;
-    width: 206px;
+    width: 178px;
   }
 
   .bgm-player--home {
@@ -1639,13 +1645,12 @@ button {
   }
 
   .bgm-track-button {
-    left: 76px;
     min-width: 42px;
   }
 
   .bgm-collapsed-copy {
     left: 60px;
-    max-width: 132px;
+    max-width: 106px;
     top: 9px;
   }
 

@@ -95,17 +95,49 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
           },
         })
         .to(".bgm-collapsed-copy", { autoAlpha: 0, x: 28, duration: 0.16 })
-        .to(".bgm-play-button", { x: 70, duration: 0.2 }, ">-0.02")
+        .to(
+          ".bgm-play-button",
+          {
+            left: () =>
+              getComputedStyle(rootRef.current).getPropertyValue(
+                "--bgm-play-expanded-left",
+              ),
+            duration: 0.2,
+          },
+          ">-0.02",
+        )
         .fromTo(
           ".bgm-previous-button",
-          { autoAlpha: 0, x: 0 },
-          { autoAlpha: 1, x: -62, duration: 0.18 },
+          {
+            autoAlpha: 0,
+            left: () =>
+              getComputedStyle(rootRef.current).getPropertyValue(
+                "--bgm-play-expanded-left",
+              ),
+          },
+          {
+            autoAlpha: 1,
+            left: () =>
+              getComputedStyle(rootRef.current).getPropertyValue("--bgm-previous-left"),
+            duration: 0.18,
+          },
           ">-0.04",
         )
         .fromTo(
           ".bgm-next-button",
-          { autoAlpha: 0, x: 0 },
-          { autoAlpha: 1, x: 62, duration: 0.18 },
+          {
+            autoAlpha: 0,
+            left: () =>
+              getComputedStyle(rootRef.current).getPropertyValue(
+                "--bgm-play-expanded-left",
+              ),
+          },
+          {
+            autoAlpha: 1,
+            left: () =>
+              getComputedStyle(rootRef.current).getPropertyValue("--bgm-next-left"),
+            duration: 0.18,
+          },
           "<0.04",
         )
         .set(".bgm-drawer-viewport", { visibility: "visible" })
@@ -339,7 +371,9 @@ export default function BgmPlayer({ isHome = false, trackList = tracks }) {
           {player.currentTrack.artist ? (
             <span className="bgm-player-artist">{player.currentTrack.artist}</span>
           ) : null}
-          <span className="bgm-player-status">{player.status}</span>
+          {player.status === "audio unavailable" ? (
+            <span className="bgm-player-status">{player.status}</span>
+          ) : null}
         </div>
       </section>
     </aside>

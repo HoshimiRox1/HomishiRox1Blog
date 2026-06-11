@@ -327,14 +327,15 @@ describe("Home mock alignment", () => {
     cleanup();
   });
 
-  it("uses the current track title and user-triggered status copy", () => {
+  it("uses the current track title without ordinary status copy", async () => {
     const loadSpy = vi
       .spyOn(HTMLMediaElement.prototype, "load")
       .mockImplementation(() => {});
     const { container, cleanup } = render(<BgmPlayer isHome />);
+    await act(async () => Promise.resolve());
 
     expect(container.textContent).toContain(tracks[0].title);
-    expect(container.textContent).toContain("user triggered");
+    expect(container.querySelector(".bgm-player-status")).toBeNull();
 
     cleanup();
     loadSpy.mockRestore();
